@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres
+    container_name: carrentPostgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: carrent
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data2:/var/lib/postgresql/data
+    networks:
+      - carrent_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: carrentPgAdmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: abdessamadaitbella98@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    ports:
+      - "8088:80"
+    depends_on:
+      - postgres
+    networks:
+      - carrent_network
+
+    # version: "2"
+    # services:
+    #   node:
+    #     image: "node:8"
+    #     user: "node"
+    #     working_dir: /home/node/app
+    #     environment:
+    #       - NODE_ENV=production
+    #     volumes: 
+    #       - ./:/home/node/app
+    #     ports: # use if it is necessary to expose the container to the host machine
+    #       - "8001:8001"
+    #     command: "npm install"
+
+  php:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    container_name: carrent_app
+    restart: always 
+    volumes:
+      - ./back_end:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - postgres
+    networks:
+      - carrent_network
+
+volumes:
+  postgres_data2:
+  
+networks:
+  carrent_network:
