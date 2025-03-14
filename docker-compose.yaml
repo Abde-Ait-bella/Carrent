@@ -28,6 +28,21 @@ services:
     networks:
       - carrent_network
 
+  frontend:
+    build:
+      context: ./front_end  # Le chemin vers ton dossier front-end
+    container_name: carrent_frontend
+    restart: always
+    ports:
+      - "3000:3000"  # Si tu utilises React, c'est généralement sur le port 3000
+    volumes:
+      - ./front_end:/app  # Monter le dossier front-end pour recompiler à la volée
+    networks:
+      - carrent_network
+    depends_on:
+      - php  # Le front-end peut dépendre du back-end si nécessaire
+
+
   php:
     build:
       context: .

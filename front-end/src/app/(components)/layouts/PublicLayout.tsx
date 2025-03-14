@@ -1,0 +1,84 @@
+
+'use client'
+import { useEffect, useState } from "react"
+import BackToTop from '../elements/BackToTop'
+import Breadcrumb from '../layout/Breadcrumb'
+import MobileMenu from '../layout/MobileMenu'
+import Offcanvas from '../layout/Offcanvas'
+import Footer1 from '../layout/footer/Footer1'
+import Footer2 from '../layout/footer/Footer2'
+import Header1 from "../layout/header/Header1"
+import Header2 from '../layout/header/Header2'
+import Header3 from '../layout/header/Header3'
+import "../../../../public/assets/css/main.css"
+
+interface LayoutProps {
+	headerStyle?: Number
+	footerStyle?: Number
+	children?: React.ReactNode
+	breadcrumbTitle?: string
+}
+
+
+export default function Layout({ headerStyle, footerStyle, breadcrumbTitle, children }: LayoutProps) {
+	const [scroll, setScroll] = useState<boolean>(false)
+	// MobileMenu
+	const [isMobileMenu, setMobileMenu] = useState<boolean>(false)
+	const handleMobileMenu = (): void => {
+		setMobileMenu(!isMobileMenu)
+		!isMobileMenu ? document.body.classList.add("mobile-menu-active") : document.body.classList.remove("mobile-menu-active")
+	}
+	// Offcanvas
+	const [isOffcanvas, setOffcanvas] = useState<boolean>(false)
+	const handleOffcanvas = (): void => {
+		setOffcanvas(!isOffcanvas)
+		!isOffcanvas ? document.body.classList.add("canvas-menu-active") : document.body.classList.remove("canvas-menu-active")
+	}
+
+
+	useEffect(() => {
+		const WOW: any = require('wowjs');
+		(window as any).wow = new WOW.WOW({
+			live: false
+		});
+
+		// Initialize WOW.js
+		(window as any).wow.init()
+
+		const handleScroll = (): void => {
+			const scrollCheck: boolean = window.scrollY > 100
+			if (scrollCheck !== scroll) {
+				setScroll(scrollCheck)
+			}
+		}
+
+		document.addEventListener("scroll", handleScroll)
+
+		return () => {
+			document.removeEventListener("scroll", handleScroll)
+		}
+	}, [scroll])
+	
+	return (
+		<>
+			<div id="top" />
+			{!headerStyle && <Header2 scroll={scroll} isMobileMenu={isMobileMenu} handleMobileMenu={handleMobileMenu} isOffcanvas={isOffcanvas} handleOffcanvas={handleOffcanvas} />}
+			{headerStyle == 1 ? <Header1 scroll={scroll} isMobileMenu={isMobileMenu} handleMobileMenu={handleMobileMenu} isOffcanvas={isOffcanvas} handleOffcanvas={handleOffcanvas} /> : null}
+			{headerStyle == 2 ? <Header2 scroll={scroll} isMobileMenu={isMobileMenu} handleMobileMenu={handleMobileMenu} isOffcanvas={isOffcanvas} handleOffcanvas={handleOffcanvas} /> : null}
+			{headerStyle == 3 ? <Header3 scroll={scroll} isMobileMenu={isMobileMenu} handleMobileMenu={handleMobileMenu} isOffcanvas={isOffcanvas} handleOffcanvas={handleOffcanvas} /> : null}
+			<MobileMenu isMobileMenu={isMobileMenu} handleMobileMenu={handleMobileMenu} />
+			<Offcanvas isOffcanvas={isOffcanvas} handleOffcanvas={handleOffcanvas} />
+
+			<main className="main">
+				{breadcrumbTitle && <Breadcrumb breadcrumbTitle={breadcrumbTitle} />}
+				{children}
+			</main>
+
+			{!footerStyle && < Footer1 />}
+			{footerStyle == 1 ? < Footer1 /> : null}
+			{footerStyle == 2 ? < Footer2 /> : null}
+
+			<BackToTop target="#top" />
+		</>
+	)
+}
