@@ -4,7 +4,6 @@ import { Urbanist } from 'next/font/google'
 // import "@/node_modules/react-modal-video/css/modal-video.css"
 // import "../../public/assets/css/main.css"
 import '../../public/tailwind-output.css'
-import ReactLoading from 'react-loading';
 
 
 export const metadata: Metadata = {

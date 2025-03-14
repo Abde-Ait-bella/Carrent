@@ -3,16 +3,34 @@ import Layout from '@/app/(components)/layouts/PublicLayout'
 import Link from 'next/link'
 import api from '../Api/axios'
 import { useState } from 'react'
-import { ToastContainer, toast } from 'react-toastify'
 import Button from '@/app/(components)/elements/Button'
 import ToastNotification from '../(components)/elements/ToastNotification'
+import Cookies from 'js-cookie'
+import { stat } from 'fs'
 
 export default function Login () {
-  const [values, setValues] = useState()
-  const [loadoing, setLoadoing] = useState(false)
-  const [showToast, setShowtoast] = useState()
+  const [state, setState] = useState<{
+    values: any
+    loading: boolean
+    typeToast: string
+    contentToast: string
+    width: string
+  }>({
+    values: null, // ou {} selon ce que tu attends
+    loading: false,
+    typeToast: '',
+    contentToast: '',
+    width: ''
+  })
 
-  const handleChange = e => {
+  const updateState = (newState: Partial<typeof state>) => {
+    setState(prevState => ({
+      ...prevState,
+      ...newState
+    }))
+  }
+
+  const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target
     let newValue
 
@@ -22,44 +40,58 @@ export default function Login () {
       newValue = value
     }
 
-    const newObject = { ...values, [name]: newValue }
+    const values = { ...state.values, [name]: newValue }
 
-    setValues(newObject)
+    updateState({values})
+
+        
   }
 
-  const handelSubmit = async e => {
-    setLoadoing(true)
-    e.preventDefault()
-    // await api
-    //   .post('/login', values)
-    //   .then(response => {
-    //     const { status, data } = response
+  const handelSubmit = async (e: any) => {
+    updateState({ loading: true })
 
-    //     if (status === 200) {
-    //       setLoadoing(false)
-      setShowtoast(true)
-    //     Cookies.set('role', data.user_role, { expires: 7, secure: true })
-    //     if (values.remember) {
-    //       localStorage.setItem('token', data.authorisation.token)
-    //       localStorage.setItem('AUTHENTICATED', true)
-    //     } else {
-    //       sessionStorage.setItem('token', data.authorisation.token)
-    //       sessionStorage.setItem('AUTHENTICATED', true)
-    //     }
-    //     window.location.href = '/dashboard'
-    //   }
-    // })
-    // .catch(({ response }) => {
-    //   toast.error(response?.data?.message || 'Une erreur est survenue !')
-    //   setLoadoing(false)
-    // })
+    e.preventDefault()
+    await api
+      .post('/login', state.values)
+      .then(response => {
+        const { status, data } = response
+
+        if (status === 200) {
+          updateState({
+            loading: false,
+            typeToast: 'success',
+            contentToast: 'Connexion réussie !',
+            width: '22rem'
+          })
+          Cookies.set('role', data.user_role, { expires: 7, secure: true })
+          Cookies.set('AUTHENTICATED', true, { expires: 7, secure: true })
+          if (state.values.remember) {
+            localStorage.setItem('token', data.authorisation.token)
+          } else {
+            sessionStorage.setItem('token', data.authorisation.token)
+          }
+          window.location.href = '/dashboard'
+        }
+      })
+      .catch(({ response }) => {
+        updateState({
+          loading: false,
+          typeToast: 'error',
+          contentToast: response?.data?.message || 'Une erreur est survenue !',
+          width: '27rem'
+        })
+      })
   }
 
   return (
     <>
-      {showToast ? 
-      <ToastNotification type='success' />
-       : ''} 
+      {state.typeToast ? (
+        <ToastNotification
+          type={state.typeToast}
+          content={state.contentToast}
+          width={state.width}
+        />
+      ) : null}
       <Layout footerStyle={1}>
         <div className='pt-140 pb-170 container'>
           <div className='row'>
@@ -116,7 +148,10 @@ export default function Login () {
                       </div>
                     </div>
                     <div className='form-group mb-30'>
-                      <Button isLoading={loadoing} onClick={handelSubmit} />
+                      <Button
+                        isLoading={state.loading}
+                        onClick={handelSubmit}
+                      />
                     </div>
                     <p className='text-md-medium text-center neutral-500'>
                       Or connect with your social account

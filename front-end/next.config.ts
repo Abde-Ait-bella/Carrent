@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
 };
 
 module.exports = {
+  reactStrictMode: false,
   experimental: {
     fetchCache: false, // Essaie de le désactiver
   },

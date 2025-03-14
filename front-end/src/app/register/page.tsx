@@ -3,46 +3,83 @@ import Layout from '@/app/(components)/layouts/PublicLayout'
 import Link from 'next/link'
 import { useState } from 'react'
 import api from '../Api/axios'
-import { ToastContainer, toast } from 'react-toastify'
+import Button from '../(components)/elements/Button'
+import ToastNotification from '../(components)/elements/ToastNotification'
+import Cookies from 'js-cookie'
 
 export default function Register () {
-  const [values, setValues] = useState()
+  const [state, setState] = useState<{
+    values: any
+    loading: boolean
+    typeToast: string
+    contentToast: string
+    width: string
+  }>({
+    values: null,
+    loading: false,
+    typeToast: '',
+    contentToast: '',
+    width: ''
+  })
 
-  const handleChange = e => {
+  const updateState = (newState: Partial<typeof state>) => {
+    setState(prevState => ({
+      ...prevState,
+      ...newState
+    }))
+  }
+
+  const handleChange = (e: any) => {
     const { name, value } = e.target
 
-    const newObject = { ...values, [name]: value }
+    const values = { ...state.values, [name]: value }
 
-    setValues(newObject)
-    console.log(values)
+    updateState({ values })
+
+    console.log(state.values)
   }
 
   const handelSubmit = async () => {
+    updateState({ loading: true })
     await api
-      .post('/signup', values)
+      .post('/signup', state.values)
       .then(response => {
         const { status, data } = response
 
         if (status === 200) {
-          toast.success(data.status)
-          console.log(data.authorisation.token)
-          if (values.remember) {
+          updateState({
+            loading: false,
+            typeToast: 'success',
+            contentToast: data.status
+          })
+
+          Cookies.set('AUTHENTICATED', true, { expires: 7, secure: true })
+          if (state.values.remember) {
             localStorage.setItem('token', data.authorisation.token)
-            localStorage.setItem('AUTHENTICATED', true)
           } else {
             sessionStorage.setItem('token', data.authorisation.token)
-            sessionStorage.setItem('AUTHENTICATED', true)
           }
           window.location.href = '/dashboard'
         }
       })
       .catch(({ response }) => {
-        toast.error(response?.data?.message || 'Une erreur est survenue !')
+        updateState({
+          loading: false,
+          typeToast: 'error',
+          contentToast: response?.data?.message || 'Une erreur est survenue !',
+          width: '27rem'
+        })
       })
   }
   return (
     <>
-      <ToastContainer />
+       {state.typeToast ? (
+        <ToastNotification
+          type={state.typeToast}
+          content={state.contentToast}
+          width={state.width}
+        />
+      ) : null}
       <Layout footerStyle={1}>
         <div className='pt-140 pb-170 container'>
           <div className='row'>
@@ -100,27 +137,7 @@ export default function Register () {
                     </div>
                   </div>
                   <div className='form-group mb-30'>
-                    <button
-                      className='w-100 btn btn-primary'
-                      onClick={handelSubmit}
-                    >
-                      Sign up
-                      <svg
-                        width={16}
-                        height={16}
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          d='M8 15L15 8L8 1M15 8L1 8'
-                          stroke='currentColor'
-                          strokeWidth='1.5'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                    </button>
+                    <Button isLoading={state.loading} onClick={handelSubmit} />
                   </div>
                   <p className='text-md-medium text-center neutral-500'>
                     Or connect with your social account
