@@ -4,7 +4,6 @@ import { Poppins } from 'next/font/google'
 import useReservationStore from '@/app/store/storeFetch'
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale'
-import Link from 'next/link';
 
 const quicksand = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 

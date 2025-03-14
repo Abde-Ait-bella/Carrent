@@ -21,7 +21,7 @@ function Sidebar () {
           <ul className='mt-6'>
             <li className='relative px-3 py-3 pl-5'>
               <span
-                className='left-0 absolute inset-y-0 bg-purple-600 rounded-tr-lg rounded-br-lg w-1'
+                className={` ${pathname == '/dashboard' ? '' : pathname == '/dashboard/clients' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
                 aria-hidden='true'
               ></span>
               <Link
@@ -46,6 +46,10 @@ function Sidebar () {
           </ul>
           <ul>
             <li className='relative px-3 py-3 pl-5'>
+            <span
+                className={` ${pathname == '/dashboard/statistical' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
+                aria-hidden='true'
+              ></span>
               <Link
                 className='inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150'
                 href='/dashboard/statistical'

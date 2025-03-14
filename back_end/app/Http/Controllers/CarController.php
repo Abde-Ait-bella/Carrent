@@ -10,9 +10,38 @@ use Storage;
 
 class CarController extends Controller
 {
+
+
     /**
-     * Display a listing of the resource.
-     */
+    
+* @OA\POST(
+* path="/api/cars",
+* summary="Retrieve all available cars",
+* description="Returns a list of all cars available in the system, including details such as brand, model, year, color, engine type, mileage, rental price per day, and availability status.",
+* @OA\RequestBody(
+* required=true,
+* @OA\JsonContent(
+* @OA\Property(property="brand", type="string", example="Toyota"),
+* @OA\Property(property="model", type="string", example="Corolla"),
+* @OA\Property(property="registration_number", type="string", example="wp744"),
+* @OA\Property(property="year", type="integer", example=2004),
+* @OA\Property(property="color", type="string", example="gray"),
+* @OA\Property(property="engine", type="string", example="1.8L VVT-i"),
+* @OA\Property(property="image", type="string", example="cars/default.jpg"),
+*     @OA\Property(property="quantity", type="integer", example=5),
+ *     @OA\Property(property="mileage", type="integer", example=7995),
+ *     @OA\Property(property="resduce", type="integer", example=4),
+ *     @OA\Property(property="stars", type="integer", example=4),
+ *     @OA\Property(property="price_per_day", type="number", format="float", example=53.43),
+ *     @OA\Property(property="status", type="string", example="available"),
+ *     @OA\Property(property="description", type="string", example="Non non voluptatibus numquam quaerat."),
+*)),
+* security={{"bearerAuth":{}}},
+* tags={"Cars"},
+* @OA\Response(response="200", description="Cars data"),
+* @OA\Response(response="403", description="Unauthenticated"),)
+*/
+
     public function index()
     {
         $cars = Car::all();

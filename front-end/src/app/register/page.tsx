@@ -47,7 +47,7 @@ export default function Register () {
         <div className='pt-140 pb-170 container'>
           <div className='row'>
             <div className='mx-auto col-lg-5'>
-              <div className='px-3 px-md-5 border rounded-3 register-content ptb-50'>
+              <div className='bg-[#CCE5F6] px-3 px-md-5 border rounded-3 register-content ptb-50'>
                 <div className='text-center'>
                   <p className='d-inline-flex align-items-center bg-2 px-4 py-2 rounded-12 text-sm-bold neutral-1000'>
                     Register
@@ -57,16 +57,16 @@ export default function Register () {
                 <div className='form-login mt-30'>
                   <div className='form-group'>
                     <input
-                      className='form-control username'
+                      className='focus:!bg-[#DDEDF8] form-control username'
                       name='name'
                       onChange={handleChange}
                       type='text'
-                      placeholder='Email / Username'
+                      placeholder='Email / Username '
                     />
                   </div>
                   <div className='form-group'>
                     <input
-                      className='form-control email'
+                      className='focus:!bg-[#DDEDF8] form-control email'
                       name='email'
                       onChange={handleChange}
                       type='text'
@@ -75,7 +75,7 @@ export default function Register () {
                   </div>
                   <div className='form-group'>
                     <input
-                      className='form-control password'
+                      className='focus:!bg-[#DDEDF8] form-control password'
                       name='password'
                       onChange={handleChange}
                       type='password'
@@ -84,7 +84,7 @@ export default function Register () {
                   </div>
                   <div className='form-group'>
                     <input
-                      className='form-control password'
+                      className='focus:!bg-[#DDEDF8] form-control password'
                       name='password_confirmation'
                       onChange={handleChange}
                       type='password'

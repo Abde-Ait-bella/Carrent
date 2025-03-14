@@ -31,3 +31,11 @@
 - Alternez entre les nuances pour créer de la profondeur et de la hiérarchie visuelle
 - Utilisez les nuances plus claires pour les interactions (hover, focus)
 - Les nuances plus foncées sont idéales pour les ombres et les contrastes
+
+- color text : #F2F9FE
+
+#CCE5F6
+#F2F9FE
+#8498c3
+#9AD3F9
+#292929

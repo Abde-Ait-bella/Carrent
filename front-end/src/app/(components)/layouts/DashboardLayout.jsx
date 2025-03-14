@@ -1,9 +1,9 @@
 'use client'
 import Sidebar from '../Sidebar'
 import Navbar from '../Navbar'
-import { Quicksand } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 
-const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] ,variable: '--font-inter', });
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] ,variable: '--font-poppins', });
 
 
 // const inter = Inter({
@@ -16,7 +16,7 @@ const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] ,variab
 const dashboardLayout = ({children}) => {
 
   return (
-    <div className={`${quicksand.variable}`}>
+    <div className={`${poppins.variable}`}>
       <div className='flex bg-gray-50 dark:bg-gray-900 h-screen'>
         <Sidebar />
         <div className='flex flex-col flex-1 w-full'>

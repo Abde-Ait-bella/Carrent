@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('reservations', function (Blueprint $table) {
 
+            $table->dropForeign(['reservation_id']);
             $table->dropColumn([
                 'reservation_id',
                 'payment_method',
@@ -20,13 +21,13 @@ return new class extends Migration
                 'amount'
             ]);
 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('car_id')->constrained()->onDelete('cascade');
-            $table->date('rental_start');
-            $table->date('rental_end');
-            $table->decimal('daily_rate', 10, 2);
-            $table->decimal('final_price', 10, 2);
-            $table->enum('state', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending');
+            $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade');
+            $table->foreignId('car_id')->after('user_id')->constrained()->onDelete('cascade');
+            $table->date('rental_start')->after('car_id');
+            $table->date('rental_end')->after('rental_start');
+            $table->decimal('daily_rate', 10, 2)->after('rental_end');
+            $table->decimal('final_price', 10, 2)->after('daily_rate');
+            $table->enum('state', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending')->after('final_price');
         });
     }
 

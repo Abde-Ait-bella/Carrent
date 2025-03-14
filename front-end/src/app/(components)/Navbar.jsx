@@ -3,10 +3,13 @@ import Link from "next/link"
 import { useState } from "react"
 import api from "../Api/axios";
 import "../globals.css";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 function Navbar () {
 
   const [click, setClick] = useState();
+  const router = useRouter();
 
     const handelSubmit = async () => {
       setClick(!click)
@@ -17,7 +20,7 @@ function Navbar () {
           
           if (status === 200) {
             toast.success(data.status)
-            window.location.href = '/'
+            router.push('/');
           }
         })
         .catch(({ response }) => {
@@ -185,31 +188,31 @@ function Navbar () {
                   </button> */}
 
               
-<button id="dropdownHoverButton" onClick={()=> setClick(!click)} data-dropdown-toggle="dropdownHover" data-dropdown-trigger="hover" className="inline-flex items-center font-medium text-white text-sm text-center" type="button">
-<img
+              <button id="dropdownHoverButton" onClick={()=> setClick(!click)} data-dropdown-toggle="dropdownHover" data-dropdown-trigger="hover" className="inline-flex items-center font-medium text-white text-sm text-center" type="button">
+                    <img
                       className='rounded-full w-8 h-8 object-cover'
                       src='https://images.unsplash.com/photo-1502378735452-bc7d86632805?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=aa3a807e1bbdfd4364d1f449eaa96d82'
                       alt=''
                       aria-hidden='true'
                     />
-</button>
+              </button>
 
-<div id="dropdownHover" className={`${click ? "" : "hidden" }  z-10 bg-[#2C5A96] absolute mt-4 right-0 dark:bg-gray-700 shadow-sm rounded-lg divide-y divide-gray-100 w-44`}>
-    <ul className="py-2 font-semibold text-gray-100 dark:text-gray-100 profile-dropdown" aria-labelledby="dropdownHoverButton">
-      <li>
-        <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Dashboard</Link>
-      </li>
-      <li>
-        <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Settings</Link>
-      </li>
-      <li>
-        <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Earnings</Link>
-      </li>
-      <li>
-        <button onClick={handelSubmit}  className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 w-full hover:text-[#0E2540] text-start">Sign out</button>
-      </li>
-    </ul>
-</div>
+              <div id="dropdownHover" className={`${click ? "" : "hidden" }  z-10 bg-[#2C5A96] absolute mt-4 right-0 dark:bg-gray-700 shadow-sm rounded-lg divide-y divide-gray-100 w-44`}>
+                  <ul className="py-2 font-font-medium text-gray-100 dark:text-gray-100 profile-dropdown" aria-labelledby="dropdownHoverButton">
+                    <li>
+                      <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Dashboard</Link>
+                    </li>
+                    <li>
+                      <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Settings</Link>
+                    </li>
+                    <li>
+                      <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Earnings</Link>
+                    </li>
+                    <li>
+                      <button onClick={handelSubmit}  className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 w-full hover:text-[#0E2540] text-start">Sign out</button>
+                    </li>
+                  </ul>
+              </div>
 
 
               {/* <template x-if="isProfileMenuOpen">

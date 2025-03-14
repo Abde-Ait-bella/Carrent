@@ -1,56 +1,65 @@
-"use client";
+'use client'
 import Layout from '@/app/(components)/layouts/PublicLayout'
 import Link from 'next/link'
 import api from '../Api/axios'
 import { useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
+import Button from '@/app/(components)/elements/Button'
+import ToastNotification from '../(components)/elements/ToastNotification'
 
 export default function Login () {
   const [values, setValues] = useState()
+  const [loadoing, setLoadoing] = useState(false)
+  const [showToast, setShowtoast] = useState()
 
   const handleChange = e => {
-	const {name, value, type, checked} = e.target;
-	let newValue;
+    const { name, value, type, checked } = e.target
+    let newValue
 
-	if (type == "checkbox") {
-		newValue = checked
-	}else{
-		newValue = value
-	}
+    if (type == 'checkbox') {
+      newValue = checked
+    } else {
+      newValue = value
+    }
 
-	const newObject = { ...values, [name]: newValue}
+    const newObject = { ...values, [name]: newValue }
 
-	setValues(newObject)
-	
+    setValues(newObject)
   }
-  const handelSubmit = async () => {
-    await api
-      .post('/login', values)
-      .then(response => {
-        const { status, data } = response
-		
-        if (status === 200) {
-			console.log('status', response);
-			toast.success(data.status)
-			console.log(data.authorisation.token);
-			if (values.remember) {
-				localStorage.setItem('token', data.authorisation.token)
-				localStorage.setItem('AUTHENTICATED', true)
-			  } else {
-				sessionStorage.setItem('token', data.authorisation.token)
-				sessionStorage.setItem('AUTHENTICATED', true)
-			  }
-			window.location.href = "/dashboard"
-        }
-      })
-      .catch(({ response }) => {
-        toast.error(response?.data?.message || 'Une erreur est survenue !')
-      }) 
+
+  const handelSubmit = async e => {
+    setLoadoing(true)
+    e.preventDefault()
+    // await api
+    //   .post('/login', values)
+    //   .then(response => {
+    //     const { status, data } = response
+
+    //     if (status === 200) {
+    //       setLoadoing(false)
+      setShowtoast(true)
+    //     Cookies.set('role', data.user_role, { expires: 7, secure: true })
+    //     if (values.remember) {
+    //       localStorage.setItem('token', data.authorisation.token)
+    //       localStorage.setItem('AUTHENTICATED', true)
+    //     } else {
+    //       sessionStorage.setItem('token', data.authorisation.token)
+    //       sessionStorage.setItem('AUTHENTICATED', true)
+    //     }
+    //     window.location.href = '/dashboard'
+    //   }
+    // })
+    // .catch(({ response }) => {
+    //   toast.error(response?.data?.message || 'Une erreur est survenue !')
+    //   setLoadoing(false)
+    // })
   }
 
   return (
     <>
-      <ToastContainer />
+      {showToast ? 
+      <ToastNotification type='success' />
+       : ''} 
       <Layout footerStyle={1}>
         <div className='pt-140 pb-170 container'>
           <div className='row'>
@@ -64,101 +73,83 @@ export default function Login () {
                     <h4 className='neutral-1000'>Welcome back</h4>
                   </div>
                   <div className='form-login mt-30'>
-                      <div className='form-group'>
-                        <input
-                          className='form-control username'
-                          onChange={handleChange}
-                          name='email'
-                          type='email'
-                          placeholder='Email / Username'
-                        />
-                      </div>
-                      <div className='form-group'>
-                        <input
-                          className='form-control password'
-                          onChange={handleChange}
-                          name='password'
-                          type='password'
-                          placeholder='****************'
-                        />
-                      </div>
-                      <div className='form-group'>
-                        <div className='box-remember-forgot'>
-                          <div className='remeber-me'>
-                            <label className='text-xs-medium neutral-500'>
-                              {' '}
-                              <input className='cb-remember' onChange={handleChange} name='remember' type='checkbox' />
-                              Remember me{' '}
-                            </label>
-                          </div>
-                          <div className='forgotpass'>
-                            <Link
-                              className='text-xs-medium neutral-500'
-                              href='#'
-                            >
-                              Forgot password?
-                            </Link>
-                          </div>
+                    <div className='form-group'>
+                      <input
+                        className='form-control username'
+                        onChange={handleChange}
+                        name='email'
+                        type='email'
+                        placeholder='Email / Username'
+                      />
+                    </div>
+                    <div className='form-group'>
+                      <input
+                        className='form-control password'
+                        onChange={handleChange}
+                        name='password'
+                        type='password'
+                        placeholder='****************'
+                      />
+                    </div>
+                    <div className='form-group'>
+                      <div className='box-remember-forgot'>
+                        <div className='remeber-me'>
+                          <label className='text-xs-medium neutral-500'>
+                            {' '}
+                            <input
+                              className='cb-remember'
+                              onChange={handleChange}
+                              name='remember'
+                              type='checkbox'
+                            />
+                            Remember me{' '}
+                          </label>
+                        </div>
+                        <div className='forgotpass'>
+                          <Link
+                            className='text-xs-medium neutral-500'
+                            href='/forget-password'
+                          >
+                            Forgot password?
+                          </Link>
                         </div>
                       </div>
-                      <div className='form-group mb-30'>
-                        <button
-                          className='w-100 btn btn-primary'
-                          onClick={handelSubmit}
-                        >
-                          Sign in
-                          <svg
-                            width={16}
-                            height={16}
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <path
-                              d='M8 15L15 8L8 1M15 8L1 8'
-                              stroke='currentColor'
-                              strokeWidth='1.5'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className='text-md-medium text-center neutral-500'>
-                        Or connect with your social account
-                      </p>
-                      <div className='box-button-logins'>
-                        <Link
-                          className='mr-10 btn btn-login btn-google'
-                          href='#'
-                        >
-                          <img
-                            src='/assets/imgs/template/popup/google.svg'
-                            alt='Carento'
-                          />
-                          <span className='text-sm-bold'>
-                            Sign up with Google
-                          </span>
-                        </Link>
-                        <Link className='mr-10 btn btn-login' href='#'>
-                          <img
-                            src='/assets/imgs/template/popup/facebook.svg'
-                            alt='Carento'
-                          />
-                        </Link>
-                        <Link className='btn btn-login' href='#'>
-                          <img
-                            src='/assets/imgs/template/popup/apple.svg'
-                            alt='Carento'
-                          />
-                        </Link>
-                      </div>
-                      <p className='mt-70 text-sm-medium text-center neutral-500'>
-                        Don’t have an account?{' '}
-                        <Link className='neutral-1000' href='/register'>
-                          Register Here !
-                        </Link>
-                      </p>
+                    </div>
+                    <div className='form-group mb-30'>
+                      <Button isLoading={loadoing} onClick={handelSubmit} />
+                    </div>
+                    <p className='text-md-medium text-center neutral-500'>
+                      Or connect with your social account
+                    </p>
+                    <div className='box-button-logins'>
+                      <Link className='mr-10 btn btn-login btn-google' href='#'>
+                        <img
+                          src='/assets/imgs/template/popup/google.svg'
+                          alt='Carento'
+                        />
+                        <span className='text-sm-bold'>
+                          Sign up with Google
+                        </span>
+                      </Link>
+                      <Link className='mr-10 btn btn-login' href='#'>
+                        <img
+                          src='/assets/imgs/template/popup/facebook.svg'
+                          alt='Carento'
+                        />
+                      </Link>
+                      <Link className='btn btn-login' href='#'>
+                        <img
+                          src='/assets/imgs/template/popup/apple.svg'
+                          alt='Carento'
+                        />
+                      </Link>
+                    </div>
+                    <p className='mt-70 text-sm-medium text-center neutral-500'>
+                      Don’t have an account?{' '}
+                      <Link className='neutral-1000' href='/register'>
+                        Register Here !
+                      </Link>
+                    </p>
                   </div>
                 </div>
               </div>

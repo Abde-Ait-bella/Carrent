@@ -16,7 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.api' => Authenticate::class
         ]);
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
