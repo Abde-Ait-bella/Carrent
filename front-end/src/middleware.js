@@ -12,7 +12,7 @@ export function middleware (req) {
 
   // 🔹 Vérification pour les pages admin
   if (adminRoutes.includes(req.nextUrl.pathname) && role !== 'admin') {
-    return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas admin
+    // return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas admin
   }
 
   // 🔹 Vérification pour les pages utilisateurs

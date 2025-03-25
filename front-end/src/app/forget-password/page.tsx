@@ -20,9 +20,8 @@ export default function Login () {
   //   theme: "colored",
   // });
 
-  const handleChange = e => {
+  const handleChange = (e:any) => {
     const { name, value } = e.target
-    let newValue
 
     const newObject = { ...values, [name]: value }
 

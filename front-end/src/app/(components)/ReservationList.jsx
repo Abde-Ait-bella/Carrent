@@ -28,7 +28,7 @@ function ReservationList () {
 
   return (
     <div>
-      <div className='shadow-lg rounded-lg w-full overflow-hidden'>
+      <div className='shadow-lg mb-8 rounded-lg w-full overflow-hidden'>
         <div className='w-full overflow-x-auto'>
           <table className='w-full whitespace-no-wrap'>
             <thead>

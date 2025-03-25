@@ -29,7 +29,7 @@ class CarFactory extends Factory
             'resduce' => $this->faker->numberBetween(1, 10),
             'stars' => $this->faker->numberBetween(1, 5),
             'price_per_day' => $this->faker->randomFloat(2, 20, 100),
-            'status' => $this->faker->randomElement(['available', 'rented']),
+            'status' => $this->faker->randomElement(['disponible', 'reserve', 'loue', 'maintenance']),
             'description' => $this->faker->sentence(),
         ];
     }

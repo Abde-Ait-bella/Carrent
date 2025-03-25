@@ -36,7 +36,7 @@ export const swiperGroup4 = {
 export const swiperGroup3 = {
 	modules: [Autoplay, Pagination, Navigation],
 	slidesPerView: 3,
-	spaceBetween: 30,
+	spaceBetween: 20,
 	slidesPerGroup: 1,
 	loop: true,
 	navigation: {

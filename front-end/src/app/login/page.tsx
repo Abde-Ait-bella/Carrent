@@ -2,13 +2,16 @@
 import Layout from '@/app/(components)/layouts/PublicLayout'
 import Link from 'next/link'
 import api from '../Api/axios'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '@/app/(components)/elements/Button'
 import ToastNotification from '../(components)/elements/ToastNotification'
 import Cookies from 'js-cookie'
-import { stat } from 'fs'
+import { useRouter } from "next/navigation"
 
 export default function Login () {
+
+  const router = useRouter()
+
   const [state, setState] = useState<{
     values: any
     loading: boolean
@@ -16,7 +19,7 @@ export default function Login () {
     contentToast: string
     width: string
   }>({
-    values: null, // ou {} selon ce que tu attends
+    values: null,
     loading: false,
     typeToast: '',
     contentToast: '',
@@ -27,10 +30,11 @@ export default function Login () {
     setState(prevState => ({
       ...prevState,
       ...newState
-    }))
+  }))
   }
 
   const handleChange = (e: any) => {
+    state.typeToast = '';
     const { name, value, type, checked } = e.target
     let newValue
 
@@ -42,15 +46,13 @@ export default function Login () {
 
     const values = { ...state.values, [name]: newValue }
 
-    updateState({values})
-
-        
+    updateState({ values })
   }
 
   const handelSubmit = async (e: any) => {
     updateState({ loading: true })
-
     e.preventDefault()
+
     await api
       .post('/login', state.values)
       .then(response => {
@@ -64,13 +66,14 @@ export default function Login () {
             width: '22rem'
           })
           Cookies.set('role', data.user_role, { expires: 7, secure: true })
-          Cookies.set('AUTHENTICATED', true, { expires: 7, secure: true })
+          Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
           if (state.values.remember) {
             localStorage.setItem('token', data.authorisation.token)
           } else {
             sessionStorage.setItem('token', data.authorisation.token)
           }
           window.location.href = '/dashboard'
+          router.push('/dashboard');
         }
       })
       .catch(({ response }) => {
