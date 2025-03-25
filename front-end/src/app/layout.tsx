@@ -5,6 +5,7 @@ import { Urbanist } from 'next/font/google'
 // import "../../public/assets/css/main.css"
 import '../../public/tailwind-output.css'
 
+import StoreProvider from '@/app/StoreProvider'
 
 export const metadata: Metadata = {
   title: 'Carrent',
@@ -19,7 +20,6 @@ const urbanist = Urbanist({
 })
 
 export default function RootLayout ({
-
   children
 }: Readonly<{
   children: React.ReactNode
@@ -27,7 +27,9 @@ export default function RootLayout ({
   return (
     <>
       <html lang='en'>
-        <body className={`${urbanist.variable} bg-[#F2F9FE]`}>{children}</body>
+        <body className={`${urbanist.variable} bg-[#F2F9FE]`}>
+          <StoreProvider>{children}</StoreProvider>
+        </body>
       </html>
     </>
   )

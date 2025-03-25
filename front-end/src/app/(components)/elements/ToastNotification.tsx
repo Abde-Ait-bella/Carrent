@@ -7,7 +7,7 @@ interface MyComponentProps {
 }
 
 const ToastNotification : React.FC<MyComponentProps> = ({type , content, width}) => {
-    console.log('width', width)
+  
     switch(type) {
       case 'success':
         // toast.success("Nous vous avons envoyé un lien pour réinitialiser votre mot de passe. Vérifiez votre adresse e-mail.", {

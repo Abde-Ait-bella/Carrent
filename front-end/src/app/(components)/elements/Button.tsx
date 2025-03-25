@@ -1,6 +1,6 @@
 import {  SpinnerRoundFilled } from 'spinners-react'
 
-function button ({isLoading, onClick}) {
+function button ({isLoading, onClick}:any) {
   return (
       <button className='w-100 btn btn-primary' onClick={onClick}>
         Sign in

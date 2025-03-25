@@ -53,7 +53,7 @@ export default function Register () {
             contentToast: data.status
           })
 
-          Cookies.set('AUTHENTICATED', true, { expires: 7, secure: true })
+          Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
           if (state.values.remember) {
             localStorage.setItem('token', data.authorisation.token)
           } else {

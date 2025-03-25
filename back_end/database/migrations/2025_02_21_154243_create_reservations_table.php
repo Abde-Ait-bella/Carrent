@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reservation_id')->constrained()->onDelete('cascade');
-            $table->enum('payment_method', ['credit_card', 'paypal', 'cash']);
-            $table->enum('payment_status', ['pending', 'completed', 'failed'])->default('pending');
-            $table->decimal('amount', 10, 2);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('car_id')->constrained()->onDelete('cascade');
+            $table->date('rental_start');
+            $table->date('rental_end');
+            $table->decimal('daily_rate', 10, 2);
+            $table->decimal('final_price', 10, 2);
+            $table->enum('state', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

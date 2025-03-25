@@ -1,3 +1,5 @@
+import { faCarRear } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Poppins, Quicksand } from 'next/font/google';
 import Link from "next/link";
 
@@ -10,7 +12,7 @@ function Sidebar () {
   const pathname = usePathname();
   return (
     <div>
-      <aside className='md:block z-20 flex-shrink-0 bg-white dark:bg-gray-800 w-64 overflow-y-auto'>
+      <aside className='md:block z-20 fixed flex-shrink-0 bg-white dark:bg-gray-800 w-64 h-full overflow-y-auto'>
         <div className='py-4 text-gray-500 dark:text-gray-400'>
           <a
              className={`ml-6 font-bold text-gray-800 dark:text-gray-200 text-3xl ${poppins.className}`}
@@ -69,12 +71,16 @@ function Sidebar () {
                 <span className={`ml-4 text-xl ${pathname == '/dashboard/statistical' ? 'text-gray-800': ''} ${quicksand.className}`} >Statistique</span>
               </Link>
             </li>
-            <li className='relative px-3 py-3 pl-5'>
-              <a
-                className='inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150'
-                href='cards.html'
+            <li className='relative py-3 pl-[1.4rem]'>
+            <span
+                className={` ${pathname == '/dashboard/cars' ? '' : pathname == '/dashboard/clients' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
+                aria-hidden='true'
+              ></span>
+              <Link
+                className={`inline-flex items-center w-full font-semibold ${pathname == '/dashboard/cars' ? 'text-gray-800': '' } hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150`}
+                href='/dashboard/cars'
               >
-                <svg
+                {/* <svg
                   className='w-5 h-5'
                   aria-hidden='true'
                   fill='none'
@@ -85,28 +91,17 @@ function Sidebar () {
                   stroke='currentColor'
                 >
                   <path d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'></path>
-                </svg>
-                <span className={`ml-4 text-xl ${quicksand.className}`}>Cards</span>
-              </a>
+                </svg> */}
+                <FontAwesomeIcon icon={faCarRear} size="lg" />
+                <span className={`ml-4 text-xl ${quicksand.className}`}>Voitures</span>
+              </Link>
             </li>
             <li className='relative px-3 py-3 pl-5'>
               <a
                 className='inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150'
                 href='charts.html'
               >
-                <svg
-                  className='w-5 h-5'
-                  aria-hidden='true'
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
-                >
-                  <path d='M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z'></path>
-                  <path d='M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z'></path>
-                </svg>
+                
                 <span className={`ml-4 text-xl ${quicksand.className}`}>Charts</span>
               </a>
             </li>

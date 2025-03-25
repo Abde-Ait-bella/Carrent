@@ -65,7 +65,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'تم انشاء الحساب',
+            'message' => 'Le compte a été créé.',
             'user' => $user,
             'authorisation' => [
                 'token' => $token,
