@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
+use App\Models\reservation_confirmation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class PaymentController extends Controller
+class ReservationConfirmationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        try {
-            $payments = Payment::with(['reservation'])->get();
-            return response()->json($payments , 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        //
     }
 
     /**
@@ -40,7 +35,7 @@ class PaymentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Payment $payment)
+    public function show(reservation_confirmation $reservation_confirmation)
     {
         //
     }
@@ -48,7 +43,7 @@ class PaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Payment $payment)
+    public function edit(reservation_confirmation $reservation_confirmation)
     {
         //
     }
@@ -56,7 +51,7 @@ class PaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Payment $payment)
+    public function update(Request $request, reservation_confirmation $reservation_confirmation)
     {
         //
     }
@@ -64,7 +59,7 @@ class PaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Payment $payment)
+    public function destroy(reservation_confirmation $reservation_confirmation)
     {
         //
     }

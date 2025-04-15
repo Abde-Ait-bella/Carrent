@@ -2,14 +2,16 @@ import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from './features/counterSlice'
 import carsSlice from './features/carsSlice'
 import reservationSlice from './features/reservationSlice'
+import paimentSlice from './features/paimentSlice'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
         counter: counterReducer, 
         cars: carsSlice,
-        reservation: reservationSlice
-    },      
+        reservation: reservationSlice,
+        paiment: paimentSlice
+    },     
   })
 }
 

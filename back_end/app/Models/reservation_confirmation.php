@@ -5,12 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class reservation_confirmation extends Model
 {
+    /** @use HasFactory<\Database\Factories\ReservationConfirmationFactory> */
     use HasFactory;
-
-    public function reservation()
-    {
-        return $this->belongsTo(Reservation::class);
-    }
 }

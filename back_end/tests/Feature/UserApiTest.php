@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+    namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Tests\TestCase;
+    use Illuminate\Foundation\Testing\RefreshDatabase;
+    use Illuminate\Support\Facades\Hash;
+    use App\Models\User;
+    use Tests\TestCase;
 
 class UserApiTest extends TestCase
 {

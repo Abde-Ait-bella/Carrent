@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { z } from 'zod'
 import { fetchReservations } from '@/lib/features/reservationSlice'
-import Formulair from '../(components)/form/Form.tsx'
-import { Ellipsis } from 'lucide-react'
+import Formulair from '../(components)/form/Form'
+import { Ellipsis, Target } from 'lucide-react'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
@@ -102,7 +102,7 @@ function CarsList() {
 
   const isReserved = (id: any) => {
     const reserved = reservations?.filter(
-      r => r.car_id == id && r.state === 'confirmed'
+      (r:any) => r.car_id == id && r.state === 'confirmed'
     )
     const reservedAll = cars?.find(
       c => c.id === id && c.quantity === reserved.length
@@ -233,12 +233,13 @@ function CarsList() {
     { name: 'description', type: 'textarea', label: 'Description' }
   ]
 
-  const toggleRef = useRef(null);
+  const toggleRef = useRef<HTMLTableDataCellElement | null>(null);
 
-  const handleClickOutside = (event) => {
-    if (toggleRef.current && !toggleRef.current.contains(event.target)) {
-      setToglleButtons(false);
+  const handleClickOutside = (event: MouseEvent): void => {
+    if (toggleRef.current && toggleRef.current.contains(event.target as Node)) {
+      return;
     }
+    setToglleButtons(false);
   };
 
   const toggleUpdate = (id:any) => {
@@ -341,7 +342,8 @@ function CarsList() {
                       <Tooltip.Trigger asChild>
                         <div>
                           <td className='px-4 py-3'>
-                            <div className='flex items-center text-md '>
+                            <div className='flex items-center gap-3 text-md '>
+                              <Target />
                               <div className='cursor-pointer'>
                                 <p
                                   className={` text-[1.2rem] ${poppins.className}`}
@@ -435,12 +437,10 @@ function CarsList() {
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                     <span
-                      className={`bg-green-100 ${quicksand.className} ${isReserved(d.id) === 'confirmed'
+                      className={`bg-green-100 ${quicksand.className} ${isReserved(d.id) === 'réservés'
                         ? 'dark:bg-green-700 bg-orange-200 text-orange-500'
-                        : isReserved(d.id) === 'réservés' ?
-                          'bg-orange-200 text-orange-500' :
-                          isReserved(d.id) === 'Certains sont réservés' ?
-                            "bg-orange-100 text-orange-300" : "dark:bg-green-600 text-green-600 dark:text-green-100"
+                        : isReserved(d.id) === 'Certains sont réservés' ?
+                          'bg-orange-100 text-orange-300' : "dark:bg-green-600 text-green-600 dark:text-green-100"
                         } px-2 py-1 rounded-full font-semibold   leading-tight`}
                     >
                       {reservations ? (

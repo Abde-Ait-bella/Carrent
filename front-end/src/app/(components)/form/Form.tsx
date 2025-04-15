@@ -98,11 +98,12 @@ const Formulair: React.FC<MyComponentProps> = ({
   const toggleDropdown = (id: any) => {
     setDropdownd(dropdownId === id ? false : id)
   }
+  
 
   return (
     <>
-      <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <AlertDialogContent className='bg-[#292929] shadow-lg border border-gray-700 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto text-white scrollbar-container'>
+      <AlertDialog open={isOpen} onOpenChange={onClose} >
+        <AlertDialogContent className='bg-[#292929] shadow-lg border border-gray-700 rounded-lg max-w-4xl max-h-[90vh] overflow-auto text-white scrollbar-container'>
           <style jsx global>{`
             .scrollbar-container::-webkit-scrollbar {
               width: 8px;
@@ -139,7 +140,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                   className='space-y-6'
                 >
                   {
-                    <div className='gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3'>
+                    <div className={`gap-4 grid grid-cols-1 ${formTitle == "Modifier Status" ? "": "sm:grid-cols-2 md:grid-cols-3"} `}>
                       {formFields.map((field: any, index: number) => (
                         <FormField
                           key={index}
@@ -150,8 +151,9 @@ const Formulair: React.FC<MyComponentProps> = ({
                               className={
                                 field.type == 'file'
                                   ? 'col-span-1 sm:col-span-2 md:col-span-3'
-                                  : field.type == 'textarea'
-                                  ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3'
+                                  : field.type == 'textarea' 
+                                  ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3' :
+                                  field?.col_span == 1 ? 'col-span-3'
                                   : ''
                               }
                             >
@@ -208,7 +210,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                                   <PopoverTrigger asChild>
                                     <Button
                                       role='combobox'
-                                      className={`${poppins.className} text-gray-400 bg-gray-800 border-gray-700 w-full`}
+                                      className={`${poppins.className} w-full text-gray-400 bg-gray-800 border-gray-700`}
                                       onClick={() => toggleDropdown(index + 1)}
                                     >
                                       {status
