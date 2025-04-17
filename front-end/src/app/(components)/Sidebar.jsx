@@ -1,4 +1,4 @@
-import { faCarRear } from '@fortawesome/free-solid-svg-icons';
+import { faCarRear, faTicket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Poppins, Quicksand } from 'next/font/google';
 import Link from "next/link";
@@ -8,14 +8,14 @@ import { usePathname } from "next/navigation";
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] });
 const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] });
 
-function Sidebar () {
+function Sidebar() {
   const pathname = usePathname();
   return (
     <div>
       <aside className='md:block z-20 fixed flex-shrink-0 bg-white dark:bg-gray-800 w-64 h-full overflow-y-auto'>
         <div className='py-4 text-gray-500 dark:text-gray-400'>
           <a
-             className={`ml-6 font-bold text-gray-800 dark:text-gray-200 text-3xl ${poppins.className}`}
+            className={`ml-6 font-bold text-gray-800 dark:text-gray-200 text-3xl ${poppins.className}`}
             href='/'
           >
             Carrent
@@ -48,7 +48,7 @@ function Sidebar () {
           </ul>
           <ul>
             <li className='relative px-3 py-3 pl-5'>
-            <span
+              <span
                 className={` ${pathname == '/dashboard/statistical' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
                 aria-hidden='true'
               ></span>
@@ -68,32 +68,33 @@ function Sidebar () {
                 >
                   <path d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'></path>
                 </svg>
-                <span className={`ml-4 text-xl ${pathname == '/dashboard/statistical' ? 'text-gray-800': ''} ${quicksand.className}`} >Statistique</span>
+                <span className={`ml-4 text-xl ${pathname == '/dashboard/statistical' ? 'text-gray-800' : ''} ${quicksand.className}`} >Statistique</span>
               </Link>
             </li>
             <li className='relative py-3 pl-[1.4rem]'>
-            <span
+              <span
                 className={` ${pathname == '/dashboard/cars' ? '' : pathname == '/dashboard/clients' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
                 aria-hidden='true'
               ></span>
               <Link
-                className={`inline-flex items-center w-full font-semibold ${pathname == '/dashboard/cars' ? 'text-gray-800': '' } hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150`}
+                className={`inline-flex items-center w-full font-semibold ${pathname == '/dashboard/cars' ? 'text-gray-800' : ''} hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150`}
                 href='/dashboard/cars'
               >
-                {/* <svg
-                  className='w-5 h-5'
-                  aria-hidden='true'
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
-                >
-                  <path d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'></path>
-                </svg> */}
                 <FontAwesomeIcon icon={faCarRear} size="lg" />
                 <span className={`ml-4 text-xl ${quicksand.className}`}>Voitures</span>
+              </Link>
+            </li>
+            <li className='relative py-3 pl-[1.4rem]'>
+              <span
+                className={` ${pathname == '/dashboard/reservations' ? '' : pathname == '/dashboard/clients' ? '' : 'hidden'} left-0 absolute inset-y-0 bg-[#1F4068] rounded-tr-lg rounded-br-lg w-1`}
+                aria-hidden='true'
+              ></span>
+              <Link
+                className={`inline-flex items-center w-full font-semibold ${pathname == '/dashboard/reservations' ? 'text-gray-800' : ''} hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150`}
+                href='/dashboard/reservations'
+              >
+                <FontAwesomeIcon icon={faTicket} size="lg" />
+                <span className={`ml-4 text-xl ${quicksand.className}`}>Reservation</span>
               </Link>
             </li>
             <li className='relative px-3 py-3 pl-5'>
@@ -101,7 +102,7 @@ function Sidebar () {
                 className='inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150'
                 href='charts.html'
               >
-                
+
                 <span className={`ml-4 text-xl ${quicksand.className}`}>Charts</span>
               </a>
             </li>

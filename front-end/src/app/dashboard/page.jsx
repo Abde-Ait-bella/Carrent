@@ -13,6 +13,7 @@ function Dashboard () {
 
       {/* <!-- reservations --> */}
       <ReservationList />
+
     </div>
   )
 }

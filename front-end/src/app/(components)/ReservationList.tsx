@@ -104,21 +104,6 @@ function ReservationList() {
             status={value || state.defaultValues.state}
             formTitle={state.formTitle}
           />
-          // :
-          // state.isOpenUppdate ?
-          //   <Form
-          //     onSubmit={onUpdateSubmit}
-          //     formFields={formFields}
-          //     isOpen={state.isOpenUppdate}
-          //     onClose={closeDialog}
-          //     validation={formSchema}
-          //     defaultValues={state.defaultValues}
-          //     setState={setValue}
-          //     status={state.status}
-          //     formTitle={state.formTitle}
-          //   />
-          //   :
-          //   null
       }
       <div className='shadow-lg mb-8 rounded-lg w-full overflow-hidden'>
         <div className='w-full overflow-x-auto'>
