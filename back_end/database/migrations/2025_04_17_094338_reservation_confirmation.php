@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string("comprehensive_insurance");
             $table->timestamps();
         });
+        
+        
     }
 
     /**
@@ -33,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('reservation_confirmations');
     }
 };
