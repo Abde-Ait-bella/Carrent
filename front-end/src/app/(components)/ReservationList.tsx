@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Poppins } from 'next/font/google';
+import { Poppins, Quicksand } from 'next/font/google';
 import { fetchReservations, updateStatus } from '@/lib/features/reservationSlice';
-import {fetchPaiments} from '@/lib/features/paimentSlice'
+import { fetchPaiments } from '@/lib/features/paimentSlice'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale'
@@ -11,11 +11,18 @@ import { Target } from 'lucide-react';
 import Form from './Form/Form';
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button';
 
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
+const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
-function ReservationList() {
+interface ReservationListProps {
+  handelOpen?: any
+}
+const ReservationList : React.FC<ReservationListProps> = ({
+  handelOpen ,
+}) => {
 
   const dispatch = useAppDispatch();
   const form = useForm();
@@ -28,7 +35,7 @@ function ReservationList() {
   const reservations = useAppSelector(state => state.reservation.reservations);
   const paiments = useAppSelector(state => state.paiment.paiments);
 
-  const [state, setState] = useState < any > ({
+  const [state, setState] = useState<any>({
     isOpen: null,
     isOpenUppdate: null,
     isOpenUppdateStatus: null,
@@ -37,8 +44,8 @@ function ReservationList() {
     status: null
   })
 
-  const updateState = (newState:any) => {
-    setState((state:any) => ({ ...state, ...newState }))
+  const updateState = (newState: any) => {
+    setState((state: any) => ({ ...state, ...newState }))
   }
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -61,49 +68,49 @@ function ReservationList() {
         { value: 'pending', label: 'Pending' },
         { value: 'canceled', label: 'Canceled' },
       ],
-      col_span : 1
+      col_span: 1
     }
   ]
-    const formSchema = z.object({
-      
-    })
+  const formSchema = z.object({
+
+  })
 
   const [value, setValue] = useState()
 
 
-  const onSubmit = (data:any) => {
+  const onSubmit = (data: any) => {
     const dataFinal = {
       ...data,
-      state : value || state.defaultValues.state
-  }
+      state: value || state.defaultValues.state
+    }
 
     dispatch(updateStatus({ data: dataFinal, id: state.defaultValues.id }))
     form.reset()
     closeDialog()
   }
 
-  const toggleUpdateStatus = (id:any) => updateState({ isOpenUppdateStatus: true, formTitle: "Modifier Status", defaultValues: reservations.find((r:any) => r.id === id) })
+  const toggleUpdateStatus = (id: any) => updateState({ isOpenUppdateStatus: true, formTitle: "Modifier Status", defaultValues: reservations.find((r: any) => r.id === id) })
 
   const closeDialog = () => {
     updateState({ isOpenUppdateStatus: false })
   }
-  
+
 
   return (
     <div>
       {
         state.isOpenUppdateStatus !== null &&
-          <Form
-            onSubmit={onSubmit}
-            formFields={formFields}
-            isOpen={state.isOpenUppdateStatus}
-            onClose={closeDialog}
-            validation={formSchema}
-            defaultValues={state.defaultValues}
-              setState={setValue}
-            status={value || state.defaultValues.state}
-            formTitle={state.formTitle}
-          />
+        <Form
+          onSubmit={onSubmit}
+          formFields={formFields}
+          isOpen={state.isOpenUppdateStatus}
+          onClose={closeDialog}
+          validation={formSchema}
+          defaultValues={state.defaultValues}
+          setState={setValue}
+          status={value || state.defaultValues.state}
+          formTitle={state.formTitle}
+        />
       }
       <div className='shadow-lg mb-8 rounded-lg w-full overflow-hidden'>
         <div className='w-full overflow-x-auto'>
@@ -128,7 +135,7 @@ function ReservationList() {
               </tr>
             </thead>
             <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
-              {paginatedData.map((d:any, index:any) => (
+              {paginatedData.map((d: any, index: any) => (
                 <tr
                   key={d.id || index}
                   className='text-gray-700 dark:text-gray-400'
@@ -194,19 +201,19 @@ function ReservationList() {
                                 <span className="text-xs uppercase tracking-wider text-[#292929]/80">
                                   Payment Status
                                 </span>
-                              </div>                              
+                              </div>
                               {(() => {
-                                const payment = paiments.find((p:any) => p.reservation_id === d.id);
+                                const payment = paiments.find((p: any) => p.reservation_id === d.id);
                                 const status = payment?.payment_status;
                                 const isPaid = status === 'completed';
                                 const isFailed = status === 'failed';
-                                
-                                const statusColors = isPaid ? 'bg-green-100 text-green-700' : 
-                                                    isFailed ? 'bg-red-500 text-red-100' : 
-                                                    'bg-orange-100 text-orange-500';
-                                
-                                const dotColor = isPaid ? 'bg-green-500' : isFailed ? 'bg-red-800' :  'bg-orange-500';
-                                
+
+                                const statusColors = isPaid ? 'bg-green-100 text-green-700' :
+                                  isFailed ? 'bg-red-500 text-red-100' :
+                                    'bg-orange-100 text-orange-500';
+
+                                const dotColor = isPaid ? 'bg-green-500' : isFailed ? 'bg-red-800' : 'bg-orange-500';
+
                                 return (
                                   <div className={`px-3 py-1 rounded-full ${statusColors} flex items-center`}>
                                     <div className={`w-2 h-2 rounded-full mr-2 ${dotColor}`}></div>
@@ -309,16 +316,26 @@ function ReservationList() {
 
                     <span
                       className={`bg-green-100 px-3 py-1 rounded-full ${poppins.className} ${d.state === 'confirmed'
-                        ? 'dark:bg-green-700 text-green-700 dark:text-green-100' : d.state === 'pending' 
-                        ? 'bg-orange-200 text-orange-500' : d.state === 'completed'
-                        ? 'bg-green-200 text-green-500' : 'bg-orange-300 text-red-500'
-                      } px-2 py-1 rounded-full font-semibold   leading-tight`}
+                        ? 'dark:bg-green-700 text-green-700 dark:text-green-100' : d.state === 'pending'
+                          ? 'bg-orange-200 text-orange-500' : d.state === 'completed'
+                            ? 'bg-green-200 text-green-500' : 'bg-orange-300 text-red-500'
+                        } px-2 py-1 rounded-full font-semibold   leading-tight`}
                     >
                       {d.state}
                     </span>
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                     <span>{formatDistanceToNow(new Date(d.created_at), { addSuffix: true, locale: fr })}</span>
+                  </td>
+
+                  <td>
+                    <Button
+                      onClick={() => handelOpen(d)}
+                      variant='outline'
+                      className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
+                    >
+                      Confirmer
+                    </Button>
                   </td>
                 </tr>
               ))}

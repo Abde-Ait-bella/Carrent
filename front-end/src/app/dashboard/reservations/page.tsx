@@ -1,15 +1,49 @@
+"use client"
+import {  Quicksand } from 'next/font/google'
 import ReservationList from "@/app/(components)/ReservationList";
 import GeneratedForm from "@/app/(components)/GeneratedForm";
+// import { Button } from "@/components/ui/button"
+import { useState } from "react";
 
 
+// const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
 function Reservations() {
-    return(
-    <>
-        <ReservationList />
-        <GeneratedForm />
-        <h1>test</h1>
-    </>)
+
+    const [state, setState] = useState({
+        isOpen: true,
+    })
+
+    const updateState = (newState: Partial<typeof state>) => {
+        setState((prevState) => ({
+            ...prevState,
+            ...newState
+        }))
+    }
+
+    const openMultipForm = (res: any) => {
+        console.log('id', res);
+        updateState({ isOpen: true } )
+    }
+
+    const closeMultiForm = () => {
+        updateState({ isOpen: false } )
+    }
+
+
+    return (
+        <>
+            <ReservationList handelOpen={openMultipForm} />
+            <GeneratedForm isOpen={state.isOpen} onClose={closeMultiForm}  />
+            {/* <Button
+                onClick={openMultipForm}
+                variant='outline'
+                className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
+            >
+                Ajouter voiture
+            </Button> */}
+
+        </>)
 }
 
 export default Reservations;

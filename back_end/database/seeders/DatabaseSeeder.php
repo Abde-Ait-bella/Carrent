@@ -15,18 +15,18 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $this->call([
-            CarSeeder::class,
-            ReservationSeeder::class,
-            RegionSeeder::class,
-            citiesSeeder::class,
-        ]);
+        // $this->call([
+        //     CarSeeder::class,
+        //     ReservationSeeder::class,
+        //     RegionSeeder::class,
+        //     citiesSeeder::class,
+        // ]);
 
         //  $this->call([
         //     PermissionSeeder::class,
         // ]);
 
-        User::factory(10)->create();
+        // User::factory(10)->create();
 
         // $adminRole = Role::create(['name' => 'admin']);
         // $userRole = Role::create(['name' => 'user']);
@@ -34,15 +34,16 @@ class DatabaseSeeder extends Seeder
         // // $adminRole->givePermissionTo(['cars.index', 'cars.store', 'cars.show', 'cars.update', 'cars.destroy', 'reservations.index', 'reservations.show']);
         // $userRole->givePermissionTo(['login', 'signup', 'logout']);
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+        ]);
 
-        $admin = User::where('email', 'test-2@gmail.com')->first();
-        if ($admin) {
-            $admin->assignRole('admin');
-        }
+        // $admin = User::where('email', 'test-2@gmail.com')->first();
+        // if ($admin) {
+        //     $admin->assignRole('admin');
+        // }
 
     }
 }

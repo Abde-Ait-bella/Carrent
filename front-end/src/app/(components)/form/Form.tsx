@@ -74,7 +74,7 @@ interface MyComponentProps {
 
 const Formulair: React.FC<MyComponentProps> = ({
   onSubmit,
-  formFields,
+  formFields, 
   isOpen,
   onClose,
   validation,
@@ -102,7 +102,7 @@ const Formulair: React.FC<MyComponentProps> = ({
 
   return (
     <>
-      <AlertDialog open={isOpen} onOpenChange={onClose} >
+      <AlertDialog open={isOpen} onOpenChange={onClose}>
         <AlertDialogContent className='bg-[#292929] shadow-lg border border-gray-700 rounded-lg max-w-4xl max-h-[90vh] overflow-auto text-white scrollbar-container'>
           <style jsx global>{`
             .scrollbar-container::-webkit-scrollbar {
@@ -133,7 +133,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                 onClick={onClose}
               />
             </div>
-            <AlertDialogDescription className='text-gray-400'>
+            <AlertDialogDescription className='text-gray-300'>
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
