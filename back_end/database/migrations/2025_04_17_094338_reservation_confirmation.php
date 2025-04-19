@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer("rest");
             $table->integer("total_price");
             $table->string("comprehensive_insurance"); //ASSURANCE TOUT RISQUE
+            $table->string("contract_path")->nullable(); 
             $table->timestamps();
         });
         
