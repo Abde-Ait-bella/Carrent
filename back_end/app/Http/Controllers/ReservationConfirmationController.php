@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reservation;
 use App\Models\reservation_confirmation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,29 +30,88 @@ class ReservationConfirmationController extends Controller
      */
     public function store(Request $request)
     {
+
+        // Check if final_return is an object with from/to dates
+        if (is_array($request->input('duration')) && 
+        isset($request->input('duration')['from']) && 
+        isset($request->input('duration')['to'])) {
+            
+            // Extract the dates
+            $startDate = $request->input('duration')['from'];
+            $finalReturn = $request->input('duration')['to'];
+            
+            // Create a new request with the modified data
+            $requestData = $request->all();
+            $requestData['rental_start'] = date('Y-m-d', strtotime($startDate));
+            $requestData['rental_end'] = date('Y-m-d', strtotime($finalReturn)) ;
+            
+            // Replace the request data
+            $request->replace($requestData);
+
+        }
+        
+        
         // Validate the request data
         $validatedData = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'rental_price' => 'required|numeric|min:0',
-            'payment_method' => 'required|string',
-            'status' => 'sometimes|string|in:pending,confirmed,completed,cancelled',
-            'notes' => 'nullable|string',
-        ]);
-        
-        // Create a new rental contract
-        $rentalContract = reservation_confirmation::create($validatedData);
-        
+                'reservation_id' => 'required|exists:reservations,id',
+                'cin' => 'required|string',
+                'rental_start' => 'required|date',
+                'rental_end' => 'required|date',
+                'permis_number' => 'required|string',
+                'permis_city_id' => 'required|exists:cities,id',
+                'phone_number' => 'required|string',
+                'address' => 'required|string',
+                // 'final_return' => 'required|date',
+                'start_date' => 'nullable|date',
+                'advance' => 'required|numeric|min:0',
+                'rest' => 'required|numeric|min:0',
+                'total_price' => 'required|numeric|min:0',
+                'comprehensive_insurance' => 'required|string',
+            ]);
+            
+            
+            // // Create a new rental contract
+            $rentalContract = reservation_confirmation::create($validatedData);
+            
+            $reservation = Reservation::find($validatedData['reservation_id']);
+
+            $reservation->update([
+                'rental_start' => $validatedData['rental_start'],
+                'rental_end' => $validatedData['rental_end']
+            ]);
+
+            // return response()->json([
+            //     'data' => $reservation,
+            // ], 201);
+
         return response()->json([
             'message' => 'Contrat de location ajouté avec succès',
-            'data' => $rentalContract
+            'data contrat' => $rentalContract,
+            'reservation' => $reservation
         ], 201);
-    }
-    public function store(Request $request)
-    {
-        //
+
+        // Validate the request data
+        // $validatedData = $request->validate([
+        //     'reservation_id' => 'required|exists:reservations,id',
+        //     'cin' => 'required|string',
+        //     'permis_number' => 'required|string',
+        //     'permis_city_id' => 'required|exists:cities,id',
+        //     'phone_number' => 'required|string',
+        //     'address' => 'required|string',
+        //     'final_return' => 'required|date',
+        //     'advance' => 'required|numeric|min:0',
+        //     'rest' => 'required|numeric|min:0',
+        //     'total_price' => 'required|numeric|min:0',
+        //     'comprehensive_insurance' => 'required|boolean',
+        // ]);
+        
+        // Create a new rental contract
+        // $rentalContract = reservation_confirmation::create($validatedData);
+        
+        // return response()->json([
+        //     'message' => 'Contrat de location ajouté avec succès',
+        //     'data' => $rentalContract
+        // ], 201);
     }
 
     /**

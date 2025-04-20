@@ -1,6 +1,7 @@
 'use client'
 
 import React, {
+  useEffect,
   useState
 } from 'react'
 import {
@@ -21,13 +22,10 @@ import {
 import {
   toast
 } from 'sonner'
-import exp from 'constants'
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { CalendarIcon, CircleXIcon } from 'lucide-react'
+import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { is } from 'date-fns/locale'
 import { Poppins } from 'next/font/google'
 import { Input } from '@/components/ui/input'
-import { log } from 'console'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
@@ -37,31 +35,34 @@ import {
 
 import { format } from "date-fns"
 
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
 import jsPDF from 'jspdf';
 
-// import { CalendarIcon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
 
 import { useAppDispatch } from '@/lib/hooks'
 import { addContract } from '@/lib/features/reservationSlice'
+import { fetchcities } from '@/lib/features/citiesSlice'
+import { useAppSelector } from '@/lib/hooks'
 
-
-const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
-
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from '@/components/ui/command'
 
 interface FormProps {
   isOpen: boolean,
   reservation: any
   onClose?: any,
+}
+
+interface DateRange {
+  from: Date | undefined;
+  to: Date | undefined;
 }
 
 const GeneratedForm: React.FC<FormProps> = ({
@@ -77,6 +78,8 @@ const GeneratedForm: React.FC<FormProps> = ({
     step: 0,
   })
 
+
+
   const [generatedPDF, setGeneratedPDF] = useState<jsPDF | null>(null);
 
   const updateState = (newState: Partial<typeof state>) => {
@@ -85,6 +88,14 @@ const GeneratedForm: React.FC<FormProps> = ({
       ...newState
     }))
   }
+
+  useEffect(() => {
+    dispatch(fetchcities())
+  }, [])
+
+  const cities = useAppSelector(state => state.cities.cities);
+
+  console.log('cities', cities);
 
   const totalSteps = 3
 
@@ -209,7 +220,7 @@ const GeneratedForm: React.FC<FormProps> = ({
     const lineHeight = 7;
 
     // Function to add data in table-like format
-    const addRow = (label, value) => {
+    const addRow = (label: string, value: any) => {
       doc.setFont('helvetica', 'bold');
       doc.text(label + ' :', leftColumn, yPos);
       doc.setFont('helvetica', 'normal');
@@ -233,6 +244,9 @@ const GeneratedForm: React.FC<FormProps> = ({
         } else {
           value = `La durée est jusqu'au ${format(new Date(value), 'dd/MM/yyyy')}`;
         }
+      }
+      if (key === 'permis_city_id' && value) {
+          value = cities.find((c) => c.id == value)?.city || '...';
       }
       if (key === 'reservation_id' && value) {
         return; // Skip reservation ID in the PDF 
@@ -276,7 +290,7 @@ const GeneratedForm: React.FC<FormProps> = ({
     if (state.step < totalSteps - 1) {
       if (state.step === 0) {
         generatePDF(dataWithReservationId);
-            dispatch(addContract(dataWithReservationId))
+        dispatch(addContract(dataWithReservationId))
       }
       updateState({ step: state.step + 1 });
     } else {
@@ -299,13 +313,18 @@ const GeneratedForm: React.FC<FormProps> = ({
       { placeholder: 'Nom', type: 'text', name: 'name', value: reservation?.user && reservation.user.name },
       { placeholder: 'CIN', type: 'text', name: 'cin' },
       { placeholder: 'Numéro de permis', type: 'text', name: 'permis_number' },
-      { placeholder: 'Ville de délivrance du permis', type: 'text', name: 'permis_city_id' },
+      {
+        placeholder: 'Ville de délivrance du permis', type: 'select', name: 'permis_city_id', options: [
+          { value: '', label: 'Sélectionner une ville' },
+          ...cities.map((city: any) => ({ value: city.id, label: city.city }))
+        ]
+      },
       { placeholder: 'Numéro de téléphone', type: 'tel', name: 'phone_number' },
       { placeholder: 'Adresse', type: 'text', name: 'address' },
       {
         placeholder: 'La durée',
         type: 'date',
-        name: 'final_return',
+        name: 'duration',
         value: {
           from: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
           to: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
@@ -315,7 +334,7 @@ const GeneratedForm: React.FC<FormProps> = ({
       },
       { placeholder: 'Avance', type: 'number', name: 'advance' },
       { placeholder: 'Reste à payer', type: 'number', name: 'rest' },
-      { placeholder: 'Prix total', type: 'number', name: 'total_price' , value : reservation?.final_price ? parseFloat(reservation?.final_price) : undefined },
+      { placeholder: 'Prix total', type: 'number', name: 'total_price', value: reservation?.final_price ? parseFloat(reservation?.final_price) : undefined },
       { placeholder: 'Assurance tous risques', type: 'switch', name: 'comprehensive_insurance' },
     ],
 
@@ -326,9 +345,15 @@ const GeneratedForm: React.FC<FormProps> = ({
     ]
   }
 
-  const [date, setDate] = React.useState<Date>()
+  const [date, setDate] = React.useState<DateRange | undefined>();
+
+  const handleDateChange = (range: DateRange | undefined) => {
+    setDate(range);
+  };
 
   console.log("date", reservation?.final_price);
+
+  const [dropdownId, setDropdownId] = useState<number | null>(null);
 
 
 
@@ -395,51 +420,17 @@ const GeneratedForm: React.FC<FormProps> = ({
                   <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {formFields[0].map((field, index) => (
-                        field.type === 'date' ? (
-                          <FormField
-                            key={index}
-                            control={form.control}
-                            name={field.name}
-                            render={({ field: controlledField }) => (
-                              <FormItem className={cn("grid gap-2 grid col-span-2 md:col-span-2")}>
-                                <FormLabel className="text-gray-700">
-                                  {field.placeholder}
-                                </FormLabel>
-                                {/* //       <Popover>
-                          //         <PopoverTrigger asChild>
-                          //           <FormControl>
-                          //             <Button
-                          //               variant="outline"
-                          //               style={{ marginTop: '1.2rem' }}
-                          //               className="w-full justify-start text-left font-normal border text-gray-500 border-gray-300"
-                          //             >
-                          //               <CalendarIcon className="mr-2 h-4 w-4" />
-                          //               {controlledField.value ? (
-                          //                 format(new Date(controlledField.value), "PPP")
-                          //               ) :
+                        <FormField
+                          key={index}
+                          control={form.control}
+                          name={field.name}
+                          render={({ field: controlledField }) => (
+                            <FormItem className={cn(`grid gap-2 ${field.type == 'date' ? 'grid col-span-2 md:col-span-2' : ''} `)}>
+                              <FormLabel className="text-gray-700">
+                                {field.placeholder}
+                              </FormLabel>
 
-                          //                 field.value ? (
-                          //                   format(new Date(field.value), "PPP")
-                          //                 ) :
-
-                          //                   (
-                          //                     <span>Pick a date</span>
-                          //                   )}
-                          //             </Button>
-                          //           </FormControl>
-                          //         </PopoverTrigger>
-                          //         <PopoverContent className="w-auto p-0">
-                          //           <Calendar
-                          //             mode="single"
-                          //             selected={controlledField.value ? new Date(controlledField.value) : undefined}
-                          //             onSelect={(date) => {
-                          //               controlledField.onChange(date);
-                          //             }}
-                          //             initialFocus
-                          //           />
-                          //         </PopoverContent>
-                          //       </Popover> */}
-                                {/* <div className={cn("grid col-span-2 md:col-span-2")}> */}
+                              {field.type === 'date' ? (
                                 <Popover>
                                   <PopoverTrigger asChild>
                                     <Button
@@ -486,7 +477,7 @@ const GeneratedForm: React.FC<FormProps> = ({
                                       }}
                                       onSelect={(range) => {
                                         controlledField.onChange(range);
-                                        setDate(range);
+                                        handleDateChange(range);
                                       }}
                                       numberOfMonths={2}
                                       className="p-3"
@@ -496,26 +487,50 @@ const GeneratedForm: React.FC<FormProps> = ({
                                     </div>
                                   </PopoverContent>
                                 </Popover>
-                                {/* </div> */}
-                                <FormMessage />
-                              </FormItem>
 
-                            )}
-                          />
-                          // /</PopoverTrigger>>
-
-                        )
-                          :
-                          field.type === 'switch' ? (
-                            <FormField
-                              key={index}
-                              control={form.control}
-                              name={field.name}
-                              render={({ field: controlledField }) => (
-                                <FormItem className="flex flex-row  items-center justify-between rounded-lg p-3 h-9 mt-[2rem] shadow-sm">
-                                  <div className="space-y-0.5">
-                                    <FormLabel className="text-gray-700">{field.placeholder}</FormLabel>
-                                  </div>
+                              ) : field.type === 'select' ? (
+                                <Popover open={dropdownId === index}>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      role="combobox"
+                                      variant={"outline"}
+                                      aria-expanded={dropdownId === index}
+                                      aria-haspopup="listbox"
+                                      className="w-full border-gray-300 text-gray-800 justify-between"
+                                      onClick={() => setDropdownId(dropdownId === index ? null : index)}
+                                    >
+                                      {controlledField.value
+                                        ? field.options?.find(option => option.value === controlledField.value)?.label
+                                        : field.placeholder || "Sélectionner une ville"}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-full p-0">
+                                    <Command>
+                                      <CommandInput placeholder="Rechercher une ville..." />
+                                      <CommandList>
+                                        <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                                        <CommandGroup>
+                                          {field.options &&
+                                            field.options.map((option) => (
+                                              <CommandItem
+                                                key={option.value}
+                                                onSelect={() => {
+                                                  controlledField.onChange(option.value);
+                                                  setDropdownId(null);
+                                                }}
+                                              >
+                                                {option.label}
+                                              </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              )
+                                : field.type === 'switch' ? (
                                   <FormControl>
                                     <Switch
                                       checked={controlledField.value}
@@ -523,36 +538,24 @@ const GeneratedForm: React.FC<FormProps> = ({
                                       className="data-[state=checked]:bg-gray-600 !mt-0"
                                     />
                                   </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                          )
-                            // Render other types of input
-                            : (
-                              <FormField
-                                key={index}
-                                control={form.control}
-                                name={field.name}
-                                render={({ field: controlledField }) => (
-                                  <FormItem>
-                                    <FormLabel className="text-gray-700">
-                                      {field.placeholder}
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        {...controlledField}
-                                        value={ controlledField.value || field.value || ''}
-                                        type={field.type || 'text'}
-                                        placeholder={field.placeholder || ''}
-                                        className="border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
+                                ) : (
+                                  <FormControl>
+                                    <Input
+                                      {...controlledField}
+                                      value={controlledField.value || field.value || ''}
+                                      type={field.type || 'text'}
+                                      placeholder={field.placeholder || ''}
+                                      className="border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                                    />
+                                  </FormControl>
                                 )}
-                              />
-                            )
-                      ))}
+                              <FormMessage />
+                            </FormItem>
+
+                          )}
+                        />
+                      ))
+                      }
                     </div>
 
                     <div className="flex justify-between pt-4">

@@ -27,13 +27,13 @@ const ReservationList : React.FC<ReservationListProps> = ({
   const dispatch = useAppDispatch();
   const form = useForm();
 
-  useEffect(() => {
-    dispatch(fetchReservations())
-    dispatch(fetchPaiments())
-  }, [])
+    useEffect(() => {
+      dispatch(fetchReservations())
+      dispatch(fetchPaiments())
+    }, [])
 
-  const reservations = useAppSelector(state => state.reservation.reservations);
-  const paiments = useAppSelector(state => state.paiment.paiments);
+    const reservations = useAppSelector(state => state.reservation.reservations);
+    const paiments = useAppSelector(state => state.paiment.paiments);
 
   const [state, setState] = useState<any>({
     isOpen: null,

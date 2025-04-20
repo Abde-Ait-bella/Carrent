@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId("permis_city_id")->constrained('cities')->onDelete('cascade');
             $table->string("phone_number");
             $table->string("address");
-            $table->integer("final_return");
             $table->integer("advance");
             $table->integer("rest");
             $table->integer("total_price");

@@ -3,6 +3,7 @@ import counterReducer from './features/counterSlice'
 import carsSlice from './features/carsSlice'
 import reservationSlice from './features/reservationSlice'
 import paimentSlice from './features/paimentSlice'
+import citiesSlice from './features/citiesSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -10,8 +11,9 @@ export const makeStore = () => {
         counter: counterReducer, 
         cars: carsSlice,
         reservation: reservationSlice,
-        paiment: paimentSlice
-    },     
+        paiment: paimentSlice,
+        cities : citiesSlice
+    },
   })
 }
 

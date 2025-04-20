@@ -14,23 +14,27 @@ export const fetchReservations = createAsyncThunk(
   }
 )
 
-export const addContract = createAsyncThunk(
-  'reservation/addContract',
-  async (contractData: any) => {
-    const response = await api.post('/addContract', contractData);
-    return response.data;
-  }
-)
-
 export const updateStatus = createAsyncThunk(
   'reservation/updateStatus',
   async ({ data, id }: { data: any; id: number }) => {
     console.log(data, id);
-    
+
     const response = await api.put(`/reservations/${id}`, data);
-    
+
     return response.data;
   })
+
+export const addContract = createAsyncThunk(
+  'reservation/addContract',
+  async (data: any ) => {
+    const response = await api.post('/addContract', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data
+  }
+)
 
 const reservationSlace = createSlice({
   name: 'reservation',
@@ -43,17 +47,17 @@ const reservationSlace = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-    .addCase(fetchReservations.fulfilled, (state, action) => {
-      state.status = 'succeeded'
-      state.reservations = action.payload
-    })
+      .addCase(fetchReservations.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.reservations = action.payload
+      })
 
-    .addCase(updateStatus.fulfilled, (state, action) => {
-            const index = state.reservations.findIndex(res => res.id === action.payload.id)
-            if (index !== -1) {
-              state.reservations[index] = action.payload 
-            }
-          })
+      .addCase(updateStatus.fulfilled, (state, action) => {
+        const index = state.reservations.findIndex(res => res.id === action.payload.id)
+        if (index !== -1) {
+          state.reservations[index] = action.payload
+        }
+      })
 
   }
 })
