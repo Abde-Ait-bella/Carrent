@@ -132,6 +132,9 @@ const ReservationList : React.FC<ReservationListProps> = ({
                 <th className={`px-4 py-3 text-[1rem] ${poppins.className}`}>
                   Date
                 </th>
+                <th className={`px-4 py-3 text-[1rem] ${poppins.className}`}>
+                  Contrat
+                </th>
               </tr>
             </thead>
             <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
@@ -334,7 +337,26 @@ const ReservationList : React.FC<ReservationListProps> = ({
                       variant='outline'
                       className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
                     >
-                      Confirmer
+                      <div className="flex items-center gap-1">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                          <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
+                          <line x1="9" y1="9" x2="10" y2="9" />
+                          <line x1="9" y1="13" x2="15" y2="13" />
+                          <line x1="9" y1="17" x2="15" y2="17" />
+                        </svg>
+                        <span>Contrat</span>
+                      </div>
                     </Button>
                   </td>
                 </tr>

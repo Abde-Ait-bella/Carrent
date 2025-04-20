@@ -42,10 +42,17 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+import jsPDF from 'jspdf';
+
 // import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+
+import { useAppDispatch } from '@/lib/hooks'
+import { addContract } from '@/lib/features/reservationSlice'
 
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
@@ -53,18 +60,24 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 
 interface FormProps {
   isOpen: boolean,
-  onClose?: any
+  reservation: any
+  onClose?: any,
 }
 
 const GeneratedForm: React.FC<FormProps> = ({
-  isOpen = true,
+  isOpen,
+  reservation,
   onClose
 }) => {
 
+  const dispatch = useAppDispatch()
+
   const [state, setState] = useState<any>({
-    isOpen: true,
+    isOpen,
     step: 0,
   })
+
+  const [generatedPDF, setGeneratedPDF] = useState<jsPDF | null>(null);
 
   const updateState = (newState: Partial<typeof state>) => {
     setState((prevState: any) => ({
@@ -82,15 +95,196 @@ const GeneratedForm: React.FC<FormProps> = ({
     reset
   } = form
 
-  const onSubmit = async (formData: Record<string, any>) => {
-    if (state.step < totalSteps - 1) {
-      updateState({ step: state.step + 1 })
-    } else {
-      console.log(formData)
-      updateState({ step: 0 })
-      reset()
+  const generatePDF = (formData: Record<string, any>) => {
+    const doc = new jsPDF();
+    // Set document properties
+    doc.setProperties({
+      title: 'Contrat de Location',
+      subject: 'Contrat de Location de Véhicule',
+      author: 'Agence de Location'
+    });
+    // Setup modern font styling for PDF
+    try {
+      // Define a text style system for consistent, modern typography
+      const textStyle = {
+        title: () => {
+          doc.setFontSize(24);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(0, 51, 102); // Deep blue for titles
+        },
+        subtitle: () => {
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(41, 128, 185); // Light blue for subtitles
+        },
+        sectionHeader: () => {
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(44, 62, 80); // Dark slate for sections
+        },
+        label: () => {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(52, 73, 94); // Slate for labels
+        },
+        normal: () => {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(60, 60, 60); // Dark gray for normal text
+        },
+        small: () => {
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(100, 100, 100); // Gray for small text
+        }
+      };
 
-      toast.success("Form successfully submitted")
+      // Set modern line spacing
+      doc.setLineHeightFactor(1.3);
+
+      // Use the text style system
+      textStyle.normal(); // Set default style
+
+      // Make text styles available throughout the PDF generation
+      Object.defineProperty(doc, 'textStyle', {
+        value: textStyle,
+        writable: false
+      });
+
+    } catch (error) {
+      console.error("Error setting up PDF styles:", error);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+    }
+    doc.addFont('Poppins-Bold.ttf', 'Poppins', 'bold');
+    doc.setFont('helvetica', 'bold'); // Using helvetica as fallback
+
+    // Add professional header
+    doc.setFillColor(41, 128, 185);
+    doc.rect(0, 0, 210, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.text('CONTRAT DE LOCATION', 105, 15, { align: 'center' });
+
+    // Reset text color for document body
+    doc.setTextColor(0, 0, 0);
+
+    // Contract reference
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('N° DE CONTRAT: ' + new Date().getTime().toString().slice(-8), 200, 40, { align: 'right' });
+    doc.text('Date: ' + new Date().toLocaleDateString(), 200, 47, { align: 'right' });
+
+    // Parties section
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ENTRE LES SOUSSIGNÉS', 105, 60, { align: 'center' });
+
+    // Rental company details
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('LE LOCATAIRE:', 20, 70);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Société Carrent', 20, 77);
+    doc.text('Adresse : Taroudant', 20, 82);
+    doc.text('Téléphone : +212 681 78 31 61', 20, 87);
+
+    doc.setFont('helvetica', 'normal');
+
+    // Separator line
+    doc.setDrawColor(41, 128, 185);
+    doc.line(20, 110, 190, 110);
+
+    // Form data section
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INFORMATIONS DU CLIENT', 105, 130, { align: 'center' });
+
+    // Create structured form data display
+    doc.setFontSize(10);
+    let yPos = 140;
+    const leftColumn = 20;
+    const rightColumn = 100;
+    const lineHeight = 7;
+
+    // Function to add data in table-like format
+    const addRow = (label, value) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label + ' :', leftColumn, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(String(value || 'Non spécifié'), rightColumn, yPos);
+      yPos += lineHeight;
+    };
+
+    // Add client data rows
+    Object.keys(formData).forEach(key => {
+      let label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      let value = formData[key];
+      if (key === 'comprehensive_insurance') {
+        value = value ? 'Oui' : 'Non';
+      }
+      if (key === 'advance' || key === 'rest' || key === 'total_price') {
+        value = value + ' DH';
+      }
+      if (key === 'final_return' && value) {
+        if (typeof value === 'object' && value.from && value.to) {
+          value = `La durée est du ${format(new Date(value.from), 'dd/MM/yyyy')} au ${format(new Date(value.to), 'dd/MM/yyyy')}`;
+        } else {
+          value = `La durée est jusqu'au ${format(new Date(value), 'dd/MM/yyyy')}`;
+        }
+      }
+      if (key === 'reservation_id' && value) {
+        return; // Skip reservation ID in the PDF 
+      }
+      addRow(label, value);
+    });
+
+    // Add signature section
+    yPos += 15;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Signature du loueur:', 20, yPos);
+    doc.text('Signature du locataire:', 130, yPos);
+    yPos += 5;
+    doc.rect(20, yPos, 60, 20);
+    doc.rect(130, yPos, 60, 20);
+
+    // Add footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Ce document constitue un contrat légal entre les parties mentionnées ci-dessus.', 105, 280, { align: 'center' });
+    doc.setFontSize(16);
+
+    setGeneratedPDF(doc); // Stocker le fichier PDF généré dans l'état
+  };
+
+  const downloadPDF = () => {
+    if (generatedPDF) {
+      generatedPDF.save('form-step1.pdf');
+    }
+  };
+
+
+  const onSubmit = async (formData: Record<string, any>) => {
+    // Add reservation ID to form data automatically
+
+    const dataWithReservationId = {
+      ...formData,
+      reservation_id: reservation.id
+    };
+
+    if (state.step < totalSteps - 1) {
+      if (state.step === 0) {
+        generatePDF(dataWithReservationId);
+            dispatch(addContract(dataWithReservationId))
+      }
+      updateState({ step: state.step + 1 });
+    } else {
+      console.log(dataWithReservationId);
+      updateState({ step: 0 });
+      reset();
+
+      toast.success("Form successfully submitted");
     }
   }
 
@@ -100,32 +294,29 @@ const GeneratedForm: React.FC<FormProps> = ({
     }
   }
 
-  // const onClose = () => {
-  //   updateState({ isOpen: false })
-  // }
-
-  // console.log("isOpen", onClose);
-
   const formFields = {
     0: [
-      { placeholder: 'CIN', type: 'text', name : 'cin' },
-      { placeholder: 'Numéro de permis', type: 'text', name : 'permis_number' },
-      { placeholder: 'Ville de délivrance du permis', type: 'text', name : 'permis_city_id' },
-      { placeholder: 'Date de délivrance', type: 'date', name : '' },
-      { placeholder: 'Numéro de téléphone', type: 'tel', name : 'phone_number' },
-      { placeholder: 'Adresse', type: 'text', name : 'address' },
-      { placeholder: 'Date de retour', type: 'date', name : 'final return ' },
-      { placeholder: 'Avance', type: 'number', name : '' },
-      { placeholder: 'Reste à payer', type: 'number', name : '' },
-      { placeholder: 'Assurance tous risques', type: 'text', name : '' },
-
-            $table->date("delicolumn: vered on");
-            $table->string("phone_number");
-            $table->string("address");
-            $table->integer("final return");
-            $table->integer("advance");
-            $table->integer("rest");
-            $table->string("comprehensive_insurance");
+      { placeholder: 'Nom', type: 'text', name: 'name', value: reservation?.user && reservation.user.name },
+      { placeholder: 'CIN', type: 'text', name: 'cin' },
+      { placeholder: 'Numéro de permis', type: 'text', name: 'permis_number' },
+      { placeholder: 'Ville de délivrance du permis', type: 'text', name: 'permis_city_id' },
+      { placeholder: 'Numéro de téléphone', type: 'tel', name: 'phone_number' },
+      { placeholder: 'Adresse', type: 'text', name: 'address' },
+      {
+        placeholder: 'La durée',
+        type: 'date',
+        name: 'final_return',
+        value: {
+          from: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
+          to: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
+        },
+        rental_start: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
+        final_return: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
+      },
+      { placeholder: 'Avance', type: 'number', name: 'advance' },
+      { placeholder: 'Reste à payer', type: 'number', name: 'rest' },
+      { placeholder: 'Prix total', type: 'number', name: 'total_price' , value : reservation?.final_price ? parseFloat(reservation?.final_price) : undefined },
+      { placeholder: 'Assurance tous risques', type: 'switch', name: 'comprehensive_insurance' },
     ],
 
     1: [
@@ -137,11 +328,15 @@ const GeneratedForm: React.FC<FormProps> = ({
 
   const [date, setDate] = React.useState<Date>()
 
+  console.log("date", reservation?.final_price);
+
+
 
   return (
     <>
 
       {
+        isOpen &&
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="rounded-lg shadow-lg max-w-4xl w-full bg-[#DDEDF8] border border-gray-300 max-h-[90vh] overflow-auto text-white 
         scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-100
@@ -201,53 +396,162 @@ const GeneratedForm: React.FC<FormProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {formFields[0].map((field, index) => (
                         field.type === 'date' ? (
-                          <div key={index} className="space-y-2 mt-1">
-                            <label className="block text-sm font-medium text-gray-700">
-                              {field.placeholder}
-                            </label>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  className="w-full justify-start text-left font-normal border text-gray-500 border-gray-300"
-                                >
-                                  <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                  mode="single"
-                                  selected={date}
-                                  onSelect={setDate}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                        ) : (
                           <FormField
                             key={index}
                             control={form.control}
-                            name={field.placeholder}
+                            name={field.name}
                             render={({ field: controlledField }) => (
-                              <FormItem>
+                              <FormItem className={cn("grid gap-2 grid col-span-2 md:col-span-2")}>
                                 <FormLabel className="text-gray-700">
                                   {field.placeholder}
                                 </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...controlledField}
-                                    type={field.type || 'text'}
-                                    placeholder={field.placeholder || ''}
-                                    className="border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
-                                  />
-                                </FormControl>
+                                {/* //       <Popover>
+                          //         <PopoverTrigger asChild>
+                          //           <FormControl>
+                          //             <Button
+                          //               variant="outline"
+                          //               style={{ marginTop: '1.2rem' }}
+                          //               className="w-full justify-start text-left font-normal border text-gray-500 border-gray-300"
+                          //             >
+                          //               <CalendarIcon className="mr-2 h-4 w-4" />
+                          //               {controlledField.value ? (
+                          //                 format(new Date(controlledField.value), "PPP")
+                          //               ) :
+
+                          //                 field.value ? (
+                          //                   format(new Date(field.value), "PPP")
+                          //                 ) :
+
+                          //                   (
+                          //                     <span>Pick a date</span>
+                          //                   )}
+                          //             </Button>
+                          //           </FormControl>
+                          //         </PopoverTrigger>
+                          //         <PopoverContent className="w-auto p-0">
+                          //           <Calendar
+                          //             mode="single"
+                          //             selected={controlledField.value ? new Date(controlledField.value) : undefined}
+                          //             onSelect={(date) => {
+                          //               controlledField.onChange(date);
+                          //             }}
+                          //             initialFocus
+                          //           />
+                          //         </PopoverContent>
+                          //       </Popover> */}
+                                {/* <div className={cn("grid col-span-2 md:col-span-2")}> */}
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      id="date"
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full border-gray-300 !mt-2.5 text-gray-900 justify-start text-left font-normal",
+                                        !date && "text-muted-foreground"
+                                      )}
+                                    >
+                                      <CalendarIcon />
+                                      {date?.from ? (
+                                        date.to ? (
+                                          <>
+                                            {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                                          </>
+                                        ) : (
+                                          format(date.from, "LLL dd, y")
+                                        )
+                                      ) : field?.value?.from ? (
+                                        field.value.to ? (
+                                          <>
+                                            {format(field.value.from, "LLL dd, y")} - {format(field.value.to, "LLL dd, y")}
+                                          </>
+                                        ) : (
+                                          format(field.value.from, "LLL dd, y")
+                                        )
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="flex flex-col w-full p-0" align="start">
+                                    <div className="p-3 bg-muted/20 border-b text-sm text-muted-foreground">
+                                      <p>Sélectionnez la durée de location</p>
+                                    </div>
+                                    <Calendar
+                                      initialFocus
+                                      mode="range"
+                                      defaultMonth={field?.rental_start || new Date()}
+                                      selected={{
+                                        from: controlledField.value?.from || field?.rental_start,
+                                        to: controlledField.value?.to || field?.final_return
+                                      }}
+                                      onSelect={(range) => {
+                                        controlledField.onChange(range);
+                                        setDate(range);
+                                      }}
+                                      numberOfMonths={2}
+                                      className="p-3"
+                                    />
+                                    <div className="p-3 border-t text-xs text-muted-foreground italic">
+                                      Cliquez et faites glisser pour sélectionner plusieurs jours
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                                {/* </div> */}
                                 <FormMessage />
                               </FormItem>
+
                             )}
                           />
+                          // /</PopoverTrigger>>
+
                         )
+                          :
+                          field.type === 'switch' ? (
+                            <FormField
+                              key={index}
+                              control={form.control}
+                              name={field.name}
+                              render={({ field: controlledField }) => (
+                                <FormItem className="flex flex-row  items-center justify-between rounded-lg p-3 h-9 mt-[2rem] shadow-sm">
+                                  <div className="space-y-0.5">
+                                    <FormLabel className="text-gray-700">{field.placeholder}</FormLabel>
+                                  </div>
+                                  <FormControl>
+                                    <Switch
+                                      checked={controlledField.value}
+                                      onCheckedChange={controlledField.onChange}
+                                      className="data-[state=checked]:bg-gray-600 !mt-0"
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          )
+                            // Render other types of input
+                            : (
+                              <FormField
+                                key={index}
+                                control={form.control}
+                                name={field.name}
+                                render={({ field: controlledField }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-700">
+                                      {field.placeholder}
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        {...controlledField}
+                                        value={ controlledField.value || field.value || ''}
+                                        type={field.type || 'text'}
+                                        placeholder={field.placeholder || ''}
+                                        className="border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            )
                       ))}
                     </div>
 
@@ -274,30 +578,13 @@ const GeneratedForm: React.FC<FormProps> = ({
               {state.step === 1 && (
                 <Form {...form}>
                   <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {formFields[state.step].map((field, index) => (
-                        <FormField
-                          key={index}
-                          control={form.control}
-                          name={field.placeholder}
-                          render={({ field: controlledField }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-700">
-                                {field.placeholder}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...controlledField}
-                                  type={field.type || 'text'}
-                                  placeholder={field.placeholder || ''}
-                                  className="border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      ))}
+                    <div className="flex justify-center mt-4">
+                      <Button
+                        onClick={downloadPDF}
+                        className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                      >
+                        Télécharger le Contrat de location
+                      </Button>
                     </div>
 
                     <div className="flex justify-between pt-4">
@@ -327,6 +614,8 @@ const GeneratedForm: React.FC<FormProps> = ({
                       <p className="text-gray-600">Veuillez vérifier vos informations avant de soumettre</p>
                     </div>
 
+
+
                     <div className="flex justify-between pt-4">
                       <Button
                         type="button"
@@ -348,8 +637,6 @@ const GeneratedForm: React.FC<FormProps> = ({
             </div>
           </div >
         </div >
-
-
       }
     </>
   )

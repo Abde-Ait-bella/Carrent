@@ -29,6 +29,28 @@ class ReservationConfirmationController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'rental_price' => 'required|numeric|min:0',
+            'payment_method' => 'required|string',
+            'status' => 'sometimes|string|in:pending,confirmed,completed,cancelled',
+            'notes' => 'nullable|string',
+        ]);
+        
+        // Create a new rental contract
+        $rentalContract = reservation_confirmation::create($validatedData);
+        
+        return response()->json([
+            'message' => 'Contrat de location ajouté avec succès',
+            'data' => $rentalContract
+        ], 201);
+    }
+    public function store(Request $request)
+    {
         //
     }
 

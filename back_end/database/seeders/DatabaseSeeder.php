@@ -15,12 +15,12 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // $this->call([
-        //     CarSeeder::class,
-        //     ReservationSeeder::class,
-        //     RegionSeeder::class,
-        //     citiesSeeder::class,
-        // ]);
+        $this->call([
+            CarSeeder::class,
+            ReservationSeeder::class,
+            RegionSeeder::class,
+            citiesSeeder::class,
+        ]);
 
         //  $this->call([
         //     PermissionSeeder::class,

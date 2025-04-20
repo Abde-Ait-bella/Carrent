@@ -14,6 +14,14 @@ export const fetchReservations = createAsyncThunk(
   }
 )
 
+export const addContract = createAsyncThunk(
+  'reservation/addContract',
+  async (contractData: any) => {
+    const response = await api.post('/addContract', contractData);
+    return response.data;
+  }
+)
+
 export const updateStatus = createAsyncThunk(
   'reservation/updateStatus',
   async ({ data, id }: { data: any; id: number }) => {

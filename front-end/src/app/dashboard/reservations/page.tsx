@@ -11,7 +11,8 @@ import { useState } from "react";
 function Reservations() {
 
     const [state, setState] = useState({
-        isOpen: true,
+        isOpen: false,
+        reservation: null
     })
 
     const updateState = (newState: Partial<typeof state>) => {
@@ -22,8 +23,9 @@ function Reservations() {
     }
 
     const openMultipForm = (res: any) => {
-        console.log('id', res);
-        updateState({ isOpen: true } )
+        updateState({ isOpen: true, reservation: res } )
+        console.log(res);
+        
     }
 
     const closeMultiForm = () => {
@@ -34,7 +36,7 @@ function Reservations() {
     return (
         <>
             <ReservationList handelOpen={openMultipForm} />
-            <GeneratedForm isOpen={state.isOpen} onClose={closeMultiForm}  />
+            <GeneratedForm isOpen={state.isOpen} reservation={state.reservation} onClose={closeMultiForm}  />
             {/* <Button
                 onClick={openMultipForm}
                 variant='outline'
