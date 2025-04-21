@@ -93,6 +93,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
 
   const closeDialog = () => {
     updateState({ isOpenUppdateStatus: false })
+    form.reset()
   }
 
 

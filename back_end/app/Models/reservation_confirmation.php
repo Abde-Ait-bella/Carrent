@@ -20,7 +20,7 @@ class reservation_confirmation extends Model
         'final_return',
         'advance',
         'rest',
-        'total_price',
+        'final_price',
         'comprehensive_insurance',
         'contract_path'
     ];

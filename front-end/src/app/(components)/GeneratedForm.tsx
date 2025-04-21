@@ -53,6 +53,8 @@ import {
   CommandItem,
   CommandList
 } from '@/components/ui/command'
+import ToastNotification from './elements/ToastNotification'
+
 
 interface FormProps {
   isOpen: boolean,
@@ -76,6 +78,8 @@ const GeneratedForm: React.FC<FormProps> = ({
   const [state, setState] = useState<any>({
     isOpen,
     step: 0,
+    typeToast: null,
+    selectedFile: null,
   })
 
 
@@ -114,6 +118,20 @@ const GeneratedForm: React.FC<FormProps> = ({
       subject: 'Contrat de Location de Véhicule',
       author: 'Agence de Location'
     });
+    
+    // Import modern fonts for titles
+    try {
+      // Add web-safe modern fonts that work well in PDFs
+      doc.addFont('https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCs16Hw5aXo.woff2', 'Montserrat', 'normal');
+      doc.addFont('https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXo.woff2', 'Montserrat', 'bold');
+      doc.addFont('https://fonts.gstatic.com/s/raleway/v28/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrE.woff2', 'Raleway', 'normal');
+      
+      // Set default title font
+      doc.setFont('Montserrat', 'bold');
+    } catch (error) {
+      console.warn("Custom fonts couldn't be loaded, using fallback fonts", error);
+      doc.setFont('helvetica', 'bold');
+    }
     // Setup modern font styling for PDF
     try {
       // Define a text style system for consistent, modern typography
@@ -121,6 +139,7 @@ const GeneratedForm: React.FC<FormProps> = ({
         title: () => {
           doc.setFontSize(24);
           doc.setFont('helvetica', 'bold');
+          doc.setFont('Montserrat', 'bold'); // Use Montserrat for titles
           doc.setTextColor(0, 51, 102); // Deep blue for titles
         },
         subtitle: () => {
@@ -205,12 +224,13 @@ const GeneratedForm: React.FC<FormProps> = ({
 
     // Separator line
     doc.setDrawColor(41, 128, 185);
-    doc.line(20, 110, 190, 110);
+    doc.line(20, 95, 190, 95);
+    // doc.line(20, 110, 190, 110);
 
     // Form data section
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('INFORMATIONS DU CLIENT', 105, 130, { align: 'center' });
+    doc.text('INFORMATIONS DU CLIENT', 105, 120, { align: 'center' });
 
     // Create structured form data display
     doc.setFontSize(10);
@@ -238,7 +258,7 @@ const GeneratedForm: React.FC<FormProps> = ({
       if (key === 'advance' || key === 'rest' || key === 'total_price') {
         value = value + ' DH';
       }
-      if (key === 'final_return' && value) {
+      if (key === 'duration' && value) {
         if (typeof value === 'object' && value.from && value.to) {
           value = `La durée est du ${format(new Date(value.from), 'dd/MM/yyyy')} au ${format(new Date(value.to), 'dd/MM/yyyy')}`;
         } else {
@@ -246,7 +266,7 @@ const GeneratedForm: React.FC<FormProps> = ({
         }
       }
       if (key === 'permis_city_id' && value) {
-          value = cities.find((c) => c.id == value)?.city || '...';
+        value = cities.find((c) => c.id == value)?.city || '...';
       }
       if (key === 'reservation_id' && value) {
         return; // Skip reservation ID in the PDF 
@@ -288,12 +308,68 @@ const GeneratedForm: React.FC<FormProps> = ({
     };
 
     if (state.step < totalSteps - 1) {
-      if (state.step === 0) {
+      if (state.step === 0 && dataWithReservationId) {
         generatePDF(dataWithReservationId);
-        dispatch(addContract(dataWithReservationId))
+        // try {
+        //   const result = await dispatch(addContract(dataWithReservationId)).unwrap();
+        //   if (result && result.status === 201) {
+        //     updateState({ typeToast: 'success', contentToast: 'Contrat créé avec succès!' });
+        //   }
+        // } catch (error) {
+          //   updateState({ typeToast: 'error', contentToast: 'Erreur lors de la création du contrat' });
+          // }
+          updateState({ step: state.step + 1 });
+      } else if (state.step === 1) {
+        // Move to the final review step
+        updateState({ step: state.step + 1 });
       }
-      updateState({ step: state.step + 1 });
-    } else {
+    } else if (state.step === 2) {
+        // Step 2 - Final submission with PDF verification
+        try {
+          // Check if we have a file input element
+          const fileInput = document.getElementById('contract-upload') as HTMLInputElement;
+          
+          if (fileInput && fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            
+            // Verify it's a PDF file
+            if (file.type === 'application/pdf') {
+              console.log('yes');
+              
+              // Now we can proceed with the contract submission
+              // Create form data to include the file
+              // const contractFormData = new FormData();
+              // contractFormData.append('pdf', file);
+              // contractFormData.append('reservation_id', reservation.id.toString());
+              
+              // Here you would send the form data with the PDF to your API
+              // For example:
+              // await fetch('/api/contracts/upload', {
+              //   method: 'POST',
+              //   body: contractFormData
+              // });
+              
+              // const result = await dispatch(addContract(dataWithReservationId)).unwrap();
+              // if (result && result.status === 201) {
+              //   updateState({ typeToast: 'success', contentToast: 'Contrat créé avec succès!' });
+              //   updateState({ step: 0 });
+              //   reset();
+              // }
+            } else {
+              // Not a PDF
+              updateState({ typeToast: 'error', contentToast: 'Veuillez télécharger un fichier PDF valide' });
+              return; // Prevent form submission
+            }
+          } else {
+            // No file selected
+            updateState({ typeToast: 'error', contentToast: 'Veuillez télécharger le contrat signé' });
+            return; // Prevent form submission
+          }
+        } catch (error) {
+          console.error('Error submitting contract:', error);
+          updateState({ typeToast: 'error', contentToast: 'Erreur lors de la création du contrat' });
+        }
+      } else {
       console.log(dataWithReservationId);
       updateState({ step: 0 });
       reset();
@@ -310,7 +386,6 @@ const GeneratedForm: React.FC<FormProps> = ({
 
   const formFields = {
     0: [
-      { placeholder: 'Nom', type: 'text', name: 'name', value: reservation?.user && reservation.user.name },
       { placeholder: 'CIN', type: 'text', name: 'cin' },
       { placeholder: 'Numéro de permis', type: 'text', name: 'permis_number' },
       {
@@ -321,6 +396,7 @@ const GeneratedForm: React.FC<FormProps> = ({
       },
       { placeholder: 'Numéro de téléphone', type: 'tel', name: 'phone_number' },
       { placeholder: 'Adresse', type: 'text', name: 'address' },
+      { placeholder: 'Avance', type: 'number', name: 'advance' },
       {
         placeholder: 'La durée',
         type: 'date',
@@ -332,9 +408,8 @@ const GeneratedForm: React.FC<FormProps> = ({
         rental_start: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
         final_return: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
       },
-      { placeholder: 'Avance', type: 'number', name: 'advance' },
       { placeholder: 'Reste à payer', type: 'number', name: 'rest' },
-      { placeholder: 'Prix total', type: 'number', name: 'total_price', value: reservation?.final_price ? parseFloat(reservation?.final_price) : undefined },
+      { placeholder: 'Prix total', type: 'number', name: 'final_price', value: reservation?.final_price ? parseFloat(reservation?.final_price) : undefined },
       { placeholder: 'Assurance tous risques', type: 'switch', name: 'comprehensive_insurance' },
     ],
 
@@ -351,14 +426,20 @@ const GeneratedForm: React.FC<FormProps> = ({
     setDate(range);
   };
 
-  console.log("date", reservation?.final_price);
-
   const [dropdownId, setDropdownId] = useState<number | null>(null);
 
 
 
   return (
     <>
+
+      {state.typeToast ? (
+        <ToastNotification
+          type={state.typeToast}
+          content={state.contentToast}
+          width={state.width}
+        />
+      ) : null}
 
       {
         isOpen &&
@@ -440,6 +521,7 @@ const GeneratedForm: React.FC<FormProps> = ({
                                         "w-full border-gray-300 !mt-2.5 text-gray-900 justify-start text-left font-normal",
                                         !date && "text-muted-foreground"
                                       )}
+                                      onClick={() => updateState({ typeToast: '' })}
                                     >
                                       <CalendarIcon />
                                       {date?.from ? (
@@ -488,54 +570,61 @@ const GeneratedForm: React.FC<FormProps> = ({
                                   </PopoverContent>
                                 </Popover>
 
-                              ) : field.type === 'select' ? (
-                                <Popover open={dropdownId === index}>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      role="combobox"
-                                      variant={"outline"}
-                                      aria-expanded={dropdownId === index}
-                                      aria-haspopup="listbox"
-                                      className="w-full border-gray-300 text-gray-800 justify-between"
-                                      onClick={() => setDropdownId(dropdownId === index ? null : index)}
-                                    >
-                                      {controlledField.value
-                                        ? field.options?.find(option => option.value === controlledField.value)?.label
-                                        : field.placeholder || "Sélectionner une ville"}
-                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-full p-0">
-                                    <Command>
-                                      <CommandInput placeholder="Rechercher une ville..." />
-                                      <CommandList>
-                                        <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
-                                        <CommandGroup>
-                                          {field.options &&
-                                            field.options.map((option) => (
-                                              <CommandItem
-                                                key={option.value}
-                                                onSelect={() => {
-                                                  controlledField.onChange(option.value);
-                                                  setDropdownId(null);
-                                                }}
-                                              >
-                                                {option.label}
-                                              </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                      </CommandList>
-                                    </Command>
-                                  </PopoverContent>
-                                </Popover>
-                              )
+                              ) : field.type === 'select' ?
+
+                                (
+                                  <Popover open={dropdownId === index}>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        type="button"
+                                        role="combobox"
+                                        variant={"outline"}
+                                        aria-expanded={dropdownId === index}
+                                        aria-haspopup="listbox"
+                                        className="w-full border-gray-300 text-gray-800 justify-between"
+                                        onClick={() => {
+                                          setDropdownId(dropdownId === index ? null : index);
+                                          updateState({ typeToast: '' })
+                                        }
+                                        }
+                                      >
+                                        {controlledField.value
+                                          ? field.options?.find(option => option.value === controlledField.value)?.label
+                                          : field.placeholder || "Sélectionner une ville"}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0">
+                                      <Command>
+                                        <CommandInput placeholder="Rechercher une ville..." />
+                                        <CommandList>
+                                          <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                                          <CommandGroup>
+                                            {field.options &&
+                                              field.options.map((option) => (
+                                                <CommandItem
+                                                  key={option.value}
+                                                  onSelect={() => {
+                                                    controlledField.onChange(option.value);
+                                                    updateState({ typeToast: '' });
+                                                    setDropdownId(null);
+                                                  }}
+                                                >
+                                                  {option.label}
+                                                </CommandItem>
+                                              ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
+                                )
                                 : field.type === 'switch' ? (
                                   <FormControl>
                                     <Switch
                                       checked={controlledField.value}
                                       onCheckedChange={controlledField.onChange}
-                                      className="data-[state=checked]:bg-gray-600 !mt-0"
+                                      className="data-[state=checked]:bg-gray-600  !mt-0"
                                     />
                                   </FormControl>
                                 ) : (
@@ -546,6 +635,10 @@ const GeneratedForm: React.FC<FormProps> = ({
                                       type={field.type || 'text'}
                                       placeholder={field.placeholder || ''}
                                       className="border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                                      onChange={(e) => {
+                                        controlledField.onChange(e);
+                                        updateState({ typeToast: '' });
+                                      }}
                                     />
                                   </FormControl>
                                 )}
@@ -562,7 +655,10 @@ const GeneratedForm: React.FC<FormProps> = ({
                       <Button
                         type="button"
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
-                        onClick={handleBack}
+                        onClick={() => {
+                          updateState({ typeToast: '' });
+                          handleBack();
+                        }}
                         disabled={state.step === 0}
                       >
                         Back
@@ -583,7 +679,11 @@ const GeneratedForm: React.FC<FormProps> = ({
                   <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-6">
                     <div className="flex justify-center mt-4">
                       <Button
-                        onClick={downloadPDF}
+                        onClick={() => {
+                          updateState({ typeToast: '' }),
+                            downloadPDF()
+                        }
+                        }
                         className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                       >
                         Télécharger le Contrat de location
@@ -594,7 +694,10 @@ const GeneratedForm: React.FC<FormProps> = ({
                       <Button
                         type="button"
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
-                        onClick={handleBack}
+                        onClick={() => {
+                          updateState({ typeToast: '' });
+                          handleBack();
+                        }}
                       >
                         Back
                       </Button>
@@ -613,8 +716,72 @@ const GeneratedForm: React.FC<FormProps> = ({
                 <Form {...form}>
                   <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-6">
                     <div className="p-4 text-center">
-                      <h3 className="text-lg font-medium text-gray-800">Révision et Soumission</h3>
-                      <p className="text-gray-600">Veuillez vérifier vos informations avant de soumettre</p>
+                      <div className="mt-6 max-w-md mx-auto">
+                      <label 
+                        htmlFor="contract-upload" 
+                        className="flex flex-col items-center justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 hover:border-blue-500 group"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg className="w-10 h-10 mb-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Cliquez pour télécharger</span> ou glissez-déposez
+                        </p>
+                        <p className="text-xs text-gray-500">PDF uniquement (MAX. 10MB)</p>
+                        </div>
+                        <input 
+                        id="contract-upload" 
+                        type="file" 
+                        className="hidden" 
+                        accept="application/pdf" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                          // Handle the file upload here
+                          console.log("File selected:", file.name);
+                          // Create state for selected file if it doesn't exist yet
+                          // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+                          if (file) {
+                            updateState({ selectedFile: file });
+                            updateState({ typeToast: '' });
+                          }
+                          }
+                        }} 
+                        />
+                      </label>
+                      </div>
+
+                      {state.selectedFile && (
+                        <div className="mt-3 flex items-center justify-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className="h-5 w-5 text-blue-500" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+                            />
+                          </svg>
+                          <span className="text-sm text-blue-700 font-medium">
+                            Fichier sélectionné: {state.selectedFile.name}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* File selection feedback */}
+                      <div className="mt-3 text-center">
+                        <p className="text-sm text-gray-600">
+                        Téléchargez le contrat signé pour finaliser la réservation
+                        </p>
+                      {/* </div> */}
+                      {/* </div> */}
+                    </div>
                     </div>
 
 
@@ -623,7 +790,10 @@ const GeneratedForm: React.FC<FormProps> = ({
                       <Button
                         type="button"
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
-                        onClick={handleBack}
+                        onClick={() => {
+                          updateState({ typeToast: '' });
+                          handleBack();
+                        }}
                       >
                         Retour
                       </Button>

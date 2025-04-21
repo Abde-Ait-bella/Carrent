@@ -65,7 +65,7 @@ class ReservationConfirmationController extends Controller
                 'start_date' => 'nullable|date',
                 'advance' => 'required|numeric|min:0',
                 'rest' => 'required|numeric|min:0',
-                'total_price' => 'required|numeric|min:0',
+                'final_price' => 'required|numeric|min:0',
                 'comprehensive_insurance' => 'required|string',
             ]);
             
@@ -77,17 +77,16 @@ class ReservationConfirmationController extends Controller
 
             $reservation->update([
                 'rental_start' => $validatedData['rental_start'],
-                'rental_end' => $validatedData['rental_end']
+                'rental_end' => $validatedData['rental_end'],
+                'final_price' => $validatedData['final_price'],
+                ''
             ]);
-
-            // return response()->json([
-            //     'data' => $reservation,
-            // ], 201);
 
         return response()->json([
             'message' => 'Contrat de location ajouté avec succès',
             'data contrat' => $rentalContract,
-            'reservation' => $reservation
+            'reservation' => $reservation,
+            'status' => 201
         ], 201);
 
         // Validate the request data
