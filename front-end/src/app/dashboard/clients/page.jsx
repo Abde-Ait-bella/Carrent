@@ -5,7 +5,7 @@ import useReservationStore from '@/app/store/storeFetch'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import cancledSVG from '../../assets/img/pending.svg'
+import cancledSVG from '../../asset²s/img/pending.svg'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 
@@ -30,8 +30,6 @@ function page () {
     startIndex,
     startIndex + itemsPerPage
   )
-
-  // const lengthreser =  reservations.find((res)=> res.id == d.user.id)
 
   const lengthreser = reservations.map(r => {
     reservations.find(res => res.user.id == r.user.id)

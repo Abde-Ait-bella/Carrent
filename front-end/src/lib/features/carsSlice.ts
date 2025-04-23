@@ -1,7 +1,6 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '@/app/Api/axios'
-import { log } from 'console'
 
 // 🔄 Action asynchrone pour récupérer les posts
 export const fetchCars = createAsyncThunk('cars/fetchCars', async () => {
@@ -46,7 +45,7 @@ export const updateCar = createAsyncThunk('cars/updateCar', async ({ newCar, id 
   return response.data;
 });
 
-export const deleteCar = createAsyncThunk('cars/deleteCar', async (id:any) => {
+export const deleteCar = createAsyncThunk('cars/deleteCar', async (id: any) => {
   const response = await api.delete('/cars/' + id);
   return response.data
 })
@@ -82,7 +81,6 @@ const initialState: CarsState = {
   error: null
 }
 
-// 📌 Création du Slice Redux
 const carsSlice = createSlice({
   name: 'cars',
   initialState,
@@ -95,19 +93,19 @@ const carsSlice = createSlice({
       })
 
       .addCase(addCar.fulfilled, (state, action) => {
-        // Ajouter directement la nouvelle voiture
-          })
+        state.cars.push(action.payload) // Ajouter la nouvelle voiture à l'ét
+      })
 
-          .addCase(updateCar.fulfilled, (state, action) => {
-            const index = state.cars.findIndex(car => car.id === action.payload.id)
-            if (index !== -1) {
-              state.cars[index] = action.payload // Mettre à jour la voiture existante
-            }
-          })
+      .addCase(updateCar.fulfilled, (state, action) => {
+        const index = state.cars.findIndex(car => car.id === action.payload.id)
+        if (index !== -1) {
+          state.cars[index] = action.payload // Mettre à jour la voiture existante
+        }
+      })
 
-          .addCase(deleteCar.fulfilled, (state, action) => {
-            state.cars = state.cars.filter(car => car.id !== action.meta.arg) // Supprimer la voiture par ID
-          })
+      .addCase(deleteCar.fulfilled, (state, action) => {
+        state.cars = state.cars.filter(car => car.id !== action.meta.arg) // Supprimer la voiture par ID
+      })
   }
 })
 

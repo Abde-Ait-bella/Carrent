@@ -21,9 +21,13 @@ class ReservationController extends Controller
     /** 
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function upadatetState(Reservation $reservation, Request $request)
     {
-
+        
+        $reservation->state = $request->state;
+        $reservation->save();
+        return response()->json($request->state, 200);
+        // return response()->json($reservation->load(['user', 'car']), 200);
         
     }
     

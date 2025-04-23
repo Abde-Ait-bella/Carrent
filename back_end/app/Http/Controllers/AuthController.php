@@ -27,7 +27,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         $token = Auth::attempt($credentials);
-        
+
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -55,23 +55,41 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cet email est déjà utilisé.',
+                ], 400);
+            } else {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
 
-        $token = Auth::login($user);
+                $token = JWTAuth::fromUser($user);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Le compte a été créé.',
-            'user' => $user,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ], 201);
+                return response()->json([
+                    'message' => 'Le compte a été créé.',
+                    'status' => 201,
+                    'user' => $user,
+                    'authorisation' => [
+                        'token' => $token,
+                        'type' => 'bearer',
+                    ]
+                ], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Une erreur est survenue lors de la création du compte.',
+            ], 500);
+        }
+
+
+      
     }
 
     public function logout()
@@ -86,7 +104,7 @@ class AuthController extends Controller
             }
             // Récupérer et invalider le token de l'utilisateur connecté
             JWTAuth::invalidate(JWTAuth::getToken());
-    
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successfully logged out',

@@ -46,7 +46,7 @@ export default function Register () {
       .then(response => {
         const { status, data } = response
 
-        if (status === 200) {
+        if (status === 201) {
           updateState({
             loading: false,
             typeToast: 'success',
@@ -60,6 +60,10 @@ export default function Register () {
             sessionStorage.setItem('token', data.authorisation.token)
           }
           window.location.href = '/dashboard'
+
+          setTimeout(() => {
+            updateState({ typeToast: '' });
+          }, 3000);
         }
       })
       .catch(({ response }) => {
@@ -69,6 +73,9 @@ export default function Register () {
           contentToast: response?.data?.message || 'Une erreur est survenue !',
           width: '27rem'
         })
+        setTimeout(() => {
+          updateState({ typeToast: '', loading: false });
+        }, 4000);
       })
   }
   return (
@@ -92,22 +99,22 @@ export default function Register () {
                   <h4 className='neutral-1000'>Create an Account</h4>
                 </div>
                 <div className='form-login mt-30'>
-                  <div className='form-group'>
-                    <input
-                      className='focus:!bg-[#DDEDF8] form-control username'
-                      name='name'
-                      onChange={handleChange}
-                      type='text'
-                      placeholder='Email / Username '
-                    />
-                  </div>
+                    <div className='form-group'>
+                      <input
+                        className='focus:!bg-[#DDEDF8] form-control username'
+                        name='name'
+                        onChange={handleChange}
+                        type='text'
+                        placeholder='Email / Username '
+                      />
+                    </div>
                   <div className='form-group'>
                     <input
                       className='focus:!bg-[#DDEDF8] form-control email'
                       name='email'
                       onChange={handleChange}
                       type='text'
-                      placeholder='Email / Username'
+                      placeholder='Email'
                     />
                   </div>
                   <div className='form-group'>
@@ -143,25 +150,25 @@ export default function Register () {
                     Or connect with your social account
                   </p>
                   <div className='box-button-logins'>
-                    <Link className='mr-10 btn btn-login btn-google' href='#'>
+                    {/* <Link className='mr-10 btn btn-login btn-google' href='#'>
                       <img
                         src='/assets/imgs/template/popup/google.svg'
                         alt='Carento'
                       />
                       <span className='text-sm-bold'>Sign up with Google</span>
-                    </Link>
-                    <Link className='mr-10 btn btn-login' href='#'>
+                    </Link> */}
+                    {/* <Link className='mr-10 btn btn-login' href='#'>
                       <img
                         src='/assets/imgs/template/popup/facebook.svg'
                         alt='Carento'
                       />
-                    </Link>
-                    <Link className='btn btn-login' href='#'>
+                    </Link> */}
+                    {/* <Link className='btn btn-login' href='#'>
                       <img
                         src='/assets/imgs/template/popup/apple.svg'
                         alt='Carento'
                       />
-                    </Link>
+                    </Link> */}
                   </div>
                   <p className='mt-70 text-sm-medium text-center neutral-500'>
                     Already have an account?{' '}

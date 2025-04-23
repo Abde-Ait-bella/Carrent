@@ -35,8 +35,6 @@ function Statistical () {
 
   return (
     <div>
-
-
       {/* <!-- Cards --> */}
       <div className='gap-6 grid md:grid-cols-3 xl:grid-cols-3 mb-8'>
         {/* <!-- Card --> */}
