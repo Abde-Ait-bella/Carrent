@@ -20,7 +20,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import { Select, SelectGroup, SelectLabel } from '@/components/ui/select'
 // Ton composant Input personnalisé
 import {
   Form,
@@ -39,20 +39,20 @@ import {
   SelectValue
 } from '@/components/ui/select'
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger
+// } from '@/components/ui/popover'
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from '@/components/ui/command'
+// import {
+//   Command,
+//   CommandEmpty,
+//   CommandGroup,
+//   CommandInput,
+//   CommandItem,
+//   CommandList
+// } from '@/components/ui/command'
 
 import { Check, ChevronsUpDown, CircleXIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -68,24 +68,28 @@ interface MyComponentProps {
   validation?: any
   defaultValues?: any
   setState?: any
+  setStatus?: any,
+  setStars?: any,
   status?: any
   formTitle?: any
 }
 
 const Formulair: React.FC<MyComponentProps> = ({
   onSubmit,
-  formFields, 
+  formFields,
   isOpen,
   onClose,
   validation,
   defaultValues,
   setState,
+  setStatus,
+  setStars,
   status,
   formTitle
 }) => {
-  const [dropdownId, setDropdownd] = React.useState<number | boolean>(false)
+  // const [dropdownId, setDropdownd] = React.useState<number | boolean>(false)
   const [valueStars, setValueStars] = React.useState('')
-  
+
   const form = useForm({
     resolver: zodResolver(validation),
     defaultValues
@@ -95,11 +99,14 @@ const Formulair: React.FC<MyComponentProps> = ({
     form.reset(defaultValues) // Mettre à jour les valeurs du formulaire
   }, [defaultValues])
 
-  const toggleDropdown = (id: any) => {
-    setDropdownd(dropdownId === id ? false : id)
-  }
-  
+  // const toggleDropdown = (id: any) => {
+  //   setDropdownd(dropdownId === id ? false : id)
+  // }hn
 
+  const [setTest, setStateTest] = React.useState<any>()
+
+  console.log('setTest', setTest);
+  
   return (
     <>
       <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -140,7 +147,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                   className='space-y-6'
                 >
                   {
-                    <div className={`gap-4 grid grid-cols-1 ${formTitle == "Modifier Status" ? "": "sm:grid-cols-2 md:grid-cols-3"} `}>
+                    <div className={`gap-4 grid grid-cols-1 ${formTitle == "Modifier Status" ? "" : "sm:grid-cols-2 md:grid-cols-3"} `}>
                       {formFields.map((field: any, index: number) => (
                         <FormField
                           key={index}
@@ -151,10 +158,10 @@ const Formulair: React.FC<MyComponentProps> = ({
                               className={
                                 field.type == 'file'
                                   ? 'col-span-1 sm:col-span-2 md:col-span-3'
-                                  : field.type == 'textarea' 
-                                  ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3' :
-                                  field?.col_span == 1 ? 'col-span-3'
-                                  : ''
+                                  : field.type == 'textarea'
+                                    ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3' :
+                                    field?.col_span == 1 ? 'col-span-3'
+                                      : ''
                               }
                             >
                               <FormLabel className={`${poppins.className}`}>
@@ -186,7 +193,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                                     {controlledField.value && (
                                       <span className='mt-1 max-w-full text-gray-400 text-xs truncate'>
                                         {typeof controlledField.value ===
-                                        'object'
+                                          'object'
                                           ? controlledField.value.name
                                           : controlledField.value}
                                       </span>
@@ -204,132 +211,220 @@ const Formulair: React.FC<MyComponentProps> = ({
                                     }}
                                   />
                                 </div>
-                              ) : field.type === 'select' &&
-                                field.label !== 'Étoiles' ? (
-                                <Popover open={dropdownId == index + 1}>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      role='combobox'
-                                      className={`${poppins.className} w-full text-gray-400 bg-gray-800 border-gray-700`}
-                                      onClick={() => toggleDropdown(index + 1)}
-                                    >
-                                      {status
+                              ) :
+                                // field.type === 'select' &&
+                                //   field.label === 'Statut' ? (
+                                //   <Popover open={dropdownId == index + 1}>
+                                //     <PopoverTrigger asChild>
+                                //       <Button
+                                //         role='combobox'
+                                //         className={`${poppins.className} w-full text-gray-400 bg-gray-800 border-gray-700`}
+                                //         onClick={() => toggleDropdown(index + 1)}
+                                //       >
+                                //         {status
+                                //           ? field.options &&
+                                //           field.options.find(
+                                //             (op: any) => op.value === status
+                                //           )?.label
+                                //           : `Select ${field.label}...`}
+                                //         <ChevronsUpDown className='opacity-50' />
+                                //       </Button>
+                                //     </PopoverTrigger>
+                                //     <PopoverContent className='p-0 w-full'>
+                                //       <Command>
+                                //         <CommandInput placeholder='Search framework...' />
+                                //         <CommandList>
+                                //           <CommandEmpty>
+                                //             No options found.
+                                //           </CommandEmpty>
+                                //           <CommandGroup>
+                                //             {field.options &&
+                                //               field.options.map((op: any) => (
+                                //                 <CommandItem
+                                //                   // key={op.value}
+                                //                   value={op.value}
+                                //                   onSelect={currentValue => {
+                                //                     setState(
+                                //                       currentValue === status
+                                //                         ? ''
+                                //                         : currentValue
+                                //                     )
+                                //                     setDropdownd(false)
+                                //                   }}
+                                //                 >
+                                //                   {op.label}
+                                //                   <Check
+                                //                     className={cn(
+                                //                       'ml-auto',
+                                //                       status === op.value
+                                //                         ? 'opacity-100'
+                                //                         : 'opacity-0'
+                                //                     )}
+                                //                   />
+                                //                 </CommandItem>
+                                //               ))}
+                                //           </CommandGroup>
+                                //         </CommandList>
+                                //       </Command>
+                                //     </PopoverContent>
+                                //   </Popover>
+                                // ) :
+                                field.type === 'select' &&
+                                  field.label === 'Étoiles' ? (
+                                  <Select
+                                    onValueChange={value => {controlledField.onChange(value)
+                                      setStars(value)
+                                      setValueStars(value)
+                                    }}
+                                    defaultValue={controlledField.value}
+                                  >
+                                    <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
+                                      <SelectValue
+                                        placeholder={
+                                          field.placeholder ||
+                                          `Sélectionner un ${field.placeholder}`
+                                        }
+                                      />
+                                      {valueStars
                                         ? field.options &&
-                                          field.options.find(
-                                            (op: any) => op.value === status
-                                          )?.label
+                                        field.options.find(
+                                          (op: any) => op.value == valueStars
+                                        )?.label
                                         : `Select ${field.label}...`}
-                                      <ChevronsUpDown className='opacity-50' />
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className='p-0 w-full'>
-                                    <Command>
-                                      <CommandInput placeholder='Search framework...' />
-                                      <CommandList>
-                                        <CommandEmpty>
-                                          No options found.
-                                        </CommandEmpty>
-                                        <CommandGroup>
-                                          {field.options &&
-                                            field.options.map((op: any) => (
-                                              <CommandItem
-                                                // key={op.value}
-                                                value={op.value}
-                                                onSelect={currentValue => {
-                                                  setState(
-                                                    currentValue === status
-                                                      ? ''
-                                                      : currentValue
-                                                  )
-                                                  setDropdownd(false)
-                                                }}
-                                              >
-                                                {op.label}
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
+
+                                      {field.options &&
+                                        field.options.map(
+                                          (option: any, indexOption: any) => (
+                                            <SelectItem
+                                              key={option.value}
+                                              value={option.value}
+                                            >
+                                              <div className='flex items-center gap-3'>
+                                                <div className='flex'>
+                                                  {Array.from(
+                                                    { length: option.value },
+                                                    v => (
+                                                      <svg
+                                                        xmlns='http://www.w3.org/2000/svg'
+                                                        className='w-5 h-5 text-yellow-400'
+                                                        viewBox='0 0 20 20'
+                                                        fill='currentColor'
+                                                      >
+                                                        <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
+                                                      </svg>
+                                                    )
+                                                  )}
+                                                </div>
                                                 <Check
                                                   className={cn(
                                                     'ml-auto',
-                                                    status === op.value
+                                                    valueStars == option.value
                                                       ? 'opacity-100'
                                                       : 'opacity-0'
                                                   )}
                                                 />
-                                              </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                      </CommandList>
-                                    </Command>
-                                  </PopoverContent>
-                                </Popover>
-                              ) : 
-                              field.type === 'select' ? (
-                                <Select
-                                  onValueChange={value => setValueStars(value)}
-                                  defaultValue={controlledField.value}
-                                >
-                                  <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
-                                    <SelectValue
-                                      placeholder={
-                                        field.placeholder ||
-                                        `Sélectionner un ${field.placeholder}`
-                                      }
-                                    />
-                                      {valueStars
-                                        ? field.options &&
-                                          field.options.find(
-                                            (op: any) => op.value == valueStars
-                                          )?.label
-                                        : `Select ${field.label}...`}
-                                  </SelectTrigger>
-                                  <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
-                                    {field.options &&
-                                      field.options.map(
-                                        (option: any, indexOption: any) => (
-                                          <SelectItem
-                                            key={option.value}
-                                            value={option.value}
-                                          >
-                                            <div className='flex items-center gap-3'>
-                                              <div className='flex'>
-                                                {Array.from(
-                                                  { length: option.value },
-                                                  v => (
-                                                    <svg
-                                                      xmlns='http://www.w3.org/2000/svg'
-                                                      className='w-5 h-5 text-yellow-400'
-                                                      viewBox='0 0 20 20'
-                                                      fill='currentColor'
-                                                    >
-                                                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
-                                                    </svg>
-                                                  )
-                                                )}
                                               </div>
-                                              <Check
-                                                className={cn(
-                                                  'ml-auto',
-                                                  valueStars == option.value
-                                                    ? 'opacity-100'
-                                                    : 'opacity-0'
-                                                )}
-                                              />
-                                            </div>
-                                          </SelectItem>
-                                        )
-                                      )}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <Input
-                                  {...controlledField}
-                                  type={field.type || 'text'}
-                                  placeholder={field.placeholder || ''}
-                                  className={`bg-gray-800 border-gray-700 ${
-                                    field.type == 'textarea'
-                                      ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3'
-                                      : ''
-                                  }`}
-                                />
-                              )}
+                                            </SelectItem>
+                                          )
+                                        )}
+
+                                    </SelectContent>
+                                  </Select>
+                                )
+                                  :
+                                  field.type === 'select' ? (
+                                    // <Select
+                                    //   value={controlledField.value}
+                                    //   onValueChange={controlledField.onChange}
+                                    //   // defaultValue={controlledField.value}
+                                    // >
+                                    //   <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
+                                    //     <SelectValue placeholder={field.placeholder || 'Select ...'} />
+                                    //   </SelectTrigger>
+                                    //   <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
+                                    //     <SelectGroup>
+                                    //       <SelectLabel>{field.label}</SelectLabel>
+                                    //       {field.options && field.options.map((option: any) => (
+                                    //         <SelectItem 
+                                    //           key={option.value} 
+                                    //           value={option.value}
+                                    //           onSelect={currentValue => {
+                                    //             controlledField.onChange(currentValue)
+                                    //             onClose()
+                                    //           }
+                                    //           } 
+                                    //         >
+                                    //           {option.label}
+                                    //         </SelectItem>
+                                    //       ))}
+                                    //     </SelectGroup>
+                                    //   </SelectContent>
+                                    // </Select>
+
+
+
+                                    <Select
+                                      onValueChange={value => {controlledField.onChange(value)
+                                        setStatus(value)
+                                      }}
+                                      defaultValue={controlledField.value}
+                                    >
+                                      <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
+                                        <SelectValue
+                                          placeholder={
+                                            field.placeholder ||
+                                            `Sélectionner un ${field.placeholder}`
+                                          }
+                                        />
+                                        {/* {
+                                        field.label
+                                        ? `Select ${field.label}...` : 'select ...'} */}
+                                      </SelectTrigger>
+                                      <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
+
+                                        {field.options &&
+                                          field.options.map(
+                                            (option: any, indexOption: any) => (
+                                              <SelectItem
+                                                key={option.value}
+                                                value={option.value}
+                                                // onSelect={() => {
+                                                //   setStateTest("currentValue")
+                                                // }}
+                                              >
+                                                <div className='flex items-center gap-3'>
+                                                  {option.label}
+                                                  {/* <Check
+                                                    className={cn(
+                                                      'ml-auto',
+                                                      controlledField.value == option.value
+                                                        ? 'opacity-100'
+                                                        : 'opacity-0'
+                                                    )}
+                                                  /> */}
+                                                </div>
+                                              </SelectItem>
+                                            )
+                                          )}
+
+                                      </SelectContent>
+                                    </Select>
+
+
+                                  ) :
+                                    (
+                                      <Input
+                                        {...controlledField}
+                                        type={field.type || 'text'}
+                                        placeholder={field.placeholder || ''}
+                                        className={`bg-gray-800 border-gray-700 ${field.type == 'textarea'
+                                          ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3'
+                                          : ''
+                                          }`}
+                                      />
+                                    )}
                               <FormMessage />
                             </FormItem>
                           )}

@@ -26,7 +26,8 @@ class ReservationController extends Controller
         
         $reservation->state = $request->state;
         $reservation->save();
-        return response()->json($reservation->load(['user', 'car']), 200);
+        return response()->json($request->state, 200);
+        // return response()->json($reservation->load(['user', 'car']), 200);
         
     }
     

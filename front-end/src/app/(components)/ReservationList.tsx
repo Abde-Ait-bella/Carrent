@@ -18,10 +18,10 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
 interface ReservationListProps {
-  handelOpen?: any
+  handleOpen?: any
 }
 const ReservationList : React.FC<ReservationListProps> = ({
-  handelOpen ,
+  handleOpen ,
 }) => {
 
   const dispatch = useAppDispatch();
@@ -62,7 +62,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
     {
       type: 'select',
       name: 'state',
-      label: 'Status',
+      label: 'Status de la reservation',
       options: [
         { value: 'confirmed', label: 'Confirmed' },
         { value: 'pending', label: 'Pending' },
@@ -79,10 +79,13 @@ const ReservationList : React.FC<ReservationListProps> = ({
 
 
   const onSubmit = (data: any) => {
+    console.log('data', data);
+    
     const dataFinal = {
       ...data,
       state: value || state.defaultValues.state
     }
+    
 
     dispatch(updateStatus({ data: dataFinal, id: state.defaultValues.id }))
     form.reset()
@@ -287,7 +290,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
                                   </div>
                                   <div className="bg-[#85C1E9]/10 border border-[#85C1E9]/20 rounded-lg px-2 py-1 inline-block">
                                     <span className="text-sm font-semibold text-[#292929]">
-                                      {d.final_price} DH
+                                      {d.total_price} DH
                                     </span>
                                   </div>
                                 </div>
@@ -332,9 +335,9 @@ const ReservationList : React.FC<ReservationListProps> = ({
                     <span>{formatDistanceToNow(new Date(d.created_at), { addSuffix: true, locale: fr })}</span>
                   </td>
 
-                  <td>
+                  <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                     <Button
-                      onClick={() => handelOpen(d)}
+                      onClick={handleOpen}
                       variant='outline'
                       className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
                     >

@@ -81,7 +81,6 @@ const initialState: CarsState = {
   error: null
 }
 
-// 📌 Création du Slice Redux
 const carsSlice = createSlice({
   name: 'cars',
   initialState,
@@ -94,7 +93,7 @@ const carsSlice = createSlice({
       })
 
       .addCase(addCar.fulfilled, (state, action) => {
-        // Ajouter directement la nouvelle voiture
+        state.cars.push(action.payload) // Ajouter la nouvelle voiture à l'ét
       })
 
       .addCase(updateCar.fulfilled, (state, action) => {

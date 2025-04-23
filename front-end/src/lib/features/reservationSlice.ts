@@ -17,7 +17,6 @@ export const fetchReservations = createAsyncThunk(
 export const updateStatus = createAsyncThunk(
   'reservation/updateStatus',
   async ({ data, id }: { data: any; id: number }) => {
-    console.log(data, id);
 
     const response = await api.put(`/reservations/${id}`, data);
 
@@ -34,6 +33,19 @@ export const addContract = createAsyncThunk(
     })
     return response.data
   }
+)
+
+export const uploadContract = createAsyncThunk(
+  'reservation/uploadContract',
+  async (data: any) => {
+    
+      const response = await api.post('/uploadContract', data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      return response.data;
+    }
 )
 
 const reservationSlace = createSlice({

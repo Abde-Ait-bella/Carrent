@@ -24,8 +24,6 @@ function Reservations() {
 
     const openMultipForm = (res: any) => {
         updateState({ isOpen: true, reservation: res } )
-        console.log(res);
-        
     }
 
     const closeMultiForm = () => {
@@ -35,7 +33,7 @@ function Reservations() {
 
     return (
         <>
-            <ReservationList handelOpen={openMultipForm} />
+            <ReservationList handleOpen={openMultipForm} />
             <GeneratedForm isOpen={state.isOpen} reservation={state.reservation} onClose={closeMultiForm}  />
             {/* <Button
                 onClick={openMultipForm}

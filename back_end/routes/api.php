@@ -32,3 +32,5 @@ Route::get('/user', [UserController::class, 'index'])->middleware('auth.api');
 Route::get('/cities', [CityController::class, 'index'])->middleware('auth.api');
 
 Route::post('addContract', [ReservationConfirmationController::class, 'store'])->middleware('auth.api');
+
+Route::post('uploadContract', [ReservationConfirmationController::class, 'uploadContractPdf'])->middleware('auth.api');

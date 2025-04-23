@@ -28,7 +28,7 @@ class CarRequest extends FormRequest
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             'color' => 'required|string|max:255',
             'engine' => 'required|string|max:255',
-            'image' => 'nullable|image',
+            'image' => 'nullable',
             'quantity' => 'required|integer|min:1',
             'mileage' => 'required|integer|min:0',
             'resduce' => 'required|integer|min:0',

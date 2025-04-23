@@ -32,55 +32,55 @@ class ReservationConfirmationController extends Controller
     {
 
         // Check if final_return is an object with from/to dates
-        if (is_array($request->input('duration')) && 
-        isset($request->input('duration')['from']) && 
-        isset($request->input('duration')['to'])) {
-            
+        if (
+            is_array($request->input('duration')) &&
+            isset($request->input('duration')['from']) &&
+            isset($request->input('duration')['to'])
+        ) {
+
             // Extract the dates
             $startDate = $request->input('duration')['from'];
             $finalReturn = $request->input('duration')['to'];
-            
+
             // Create a new request with the modified data
             $requestData = $request->all();
             $requestData['rental_start'] = date('Y-m-d', strtotime($startDate));
-            $requestData['rental_end'] = date('Y-m-d', strtotime($finalReturn)) ;
-            
+            $requestData['rental_end'] = date('Y-m-d', strtotime($finalReturn));
+
             // Replace the request data
             $request->replace($requestData);
 
         }
-        
-        
+
+
         // Validate the request data
         $validatedData = $request->validate([
-                'reservation_id' => 'required|exists:reservations,id',
-                'cin' => 'required|string',
-                'rental_start' => 'required|date',
-                'rental_end' => 'required|date',
-                'permis_number' => 'required|string',
-                'permis_city_id' => 'required|exists:cities,id',
-                'phone_number' => 'required|string',
-                'address' => 'required|string',
-                // 'final_return' => 'required|date',
-                'start_date' => 'nullable|date',
-                'advance' => 'required|numeric|min:0',
-                'rest' => 'required|numeric|min:0',
-                'final_price' => 'required|numeric|min:0',
-                'comprehensive_insurance' => 'required|string',
-            ]);
-            
-            
-            // // Create a new rental contract
-            $rentalContract = reservation_confirmation::create($validatedData);
-            
-            $reservation = Reservation::find($validatedData['reservation_id']);
+            'reservation_id' => 'required|exists:strokeWidth,id',
+            'cin' => 'required|string',
+            'rental_start' => 'required|date',
+            'rental_end' => 'required|date',
+            'permis_number' => 'required|string',
+            'permis_city_id' => 'required|exists:cities,id',
+            'phone_number' => 'required|string',
+            'address' => 'required|string',
+            'start_date' => 'nullable|date',
+            'advance' => 'required|numeric|min:0',
+            'rest' => 'required|numeric|min:0',
+            'final_price' => 'required|numeric|min:0',
+            'comprehensive_insurance' => 'required|string',
+        ]);
 
-            $reservation->update([
-                'rental_start' => $validatedData['rental_start'],
-                'rental_end' => $validatedData['rental_end'],
-                'final_price' => $validatedData['final_price'],
-                ''
-            ]);
+
+        // // Create a new rental contract
+        $rentalContract = reservation_confirmation::create($validatedData);
+
+        $reservation = Reservation::find($validatedData['reservation_id']);
+
+        $reservation->update([
+            'rental_start' => $validatedData['rental_start'],
+            'rental_end' => $validatedData['rental_end'],
+            'total_price' => $validatedData['final_price'],
+        ]);
 
         return response()->json([
             'message' => 'Contrat de location ajouté avec succès',
@@ -91,7 +91,7 @@ class ReservationConfirmationController extends Controller
 
         // Validate the request data
         // $validatedData = $request->validate([
-        //     'reservation_id' => 'required|exists:reservations,id',
+        //     'reservation_id' => 'required|exists:strokeWidth,id',
         //     'cin' => 'required|string',
         //     'permis_number' => 'required|string',
         //     'permis_city_id' => 'required|exists:cities,id',
@@ -103,14 +103,63 @@ class ReservationConfirmationController extends Controller
         //     'total_price' => 'required|numeric|min:0',
         //     'comprehensive_insurance' => 'required|boolean',
         // ]);
-        
+
         // Create a new rental contract
         // $rentalContract = reservation_confirmation::create($validatedData);
-        
+
         // return response()->json([
         //     'message' => 'Contrat de location ajouté avec succès',
         //     'data' => $rentalContract
         // ], 201);
+    }
+
+    /**
+     * Upload a PDF contract confirmation file.
+     */
+    public function uploadContractPdf(Request $request)
+    {
+        // Find the reservation confirmation
+        $request->validate([
+            'reservation_id' => 'required|exists:reservation_confirmations,id',
+            'contract_file' => '', // 5MB max size
+        ]);
+
+        $confirmation = reservation_confirmation::findOrFail(1);
+
+        // // Validate the request - make sure it has a PDF file
+
+        if ($request->hasFile('contract_file')) {
+            // Get the file
+            $file = $request->file('contract_file');
+
+            // Generate a unique filename
+            $filename = 'contract_' . $request['id'] . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+            // Store the file in the storage/app/public/contracts directory
+            $path = $file->storeAs('contracts', $filename, 'public');
+
+            // Update the reservation confirmation with the file path
+            $confirmation->contract_path = $path;
+            $confirmation->save();
+
+            // Update the related reservation status to confirmed
+            $reservation = Reservation::find($confirmation->reservation_id);
+            if ($reservation) {
+                $reservation->update(['state' => 'confirmed']);
+            }
+
+            return response()->json([
+                'message' => 'Fichier de contrat téléchargé avec succès',
+                'file_path' => $path,
+                'status' => 201,
+                'request' => $request->all()
+            ], 201);
+        }
+
+        return response()->json([
+            'message' => 'Aucun fichier trouvé',
+            'status' => 400,
+        ], 400);
     }
 
     /**
