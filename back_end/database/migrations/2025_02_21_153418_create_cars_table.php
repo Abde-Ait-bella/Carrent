@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('resduce');
             $table->integer('stars');
             $table->decimal('price_per_day', 10, 2);
-            $table->enum('status', ['available', 'rented', 'maintenance']);
+            $table->enum('status', ['disponible', 'reserve', 'loue', 'maintenance']);
             $table->text('description')->nullable();
             $table->timestamps();
         });

@@ -1,0 +1,111 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Carrent API",
+        "description": "API for managing a car rental platform, allowing users to browse available cars, check details, and make reservations.",
+        "contact": {
+            "email": "abdessamadaitbella1998@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/cars": {
+            "post": {
+                "tags": [
+                    "Cars"
+                ],
+                "summary": "Retrieve all available cars",
+                "description": "Returns a list of all cars available in the system, including details such as brand, model, year, color, engine type, mileage, rental price per day, and availability status.",
+                "operationId": "c4094e8057d6802b53fe419667447d40",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "brand": {
+                                        "type": "string",
+                                        "example": "Toyota"
+                                    },
+                                    "model": {
+                                        "type": "string",
+                                        "example": "Corolla"
+                                    },
+                                    "registration_number": {
+                                        "type": "string",
+                                        "example": "wp744"
+                                    },
+                                    "year": {
+                                        "type": "integer",
+                                        "example": 2004
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "gray"
+                                    },
+                                    "engine": {
+                                        "type": "string",
+                                        "example": "1.8L VVT-i"
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "example": "cars/default.jpg"
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "mileage": {
+                                        "type": "integer",
+                                        "example": 7995
+                                    },
+                                    "resduce": {
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "stars": {
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "price_per_day": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 53.43
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "available"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Non non voluptatibus numquam quaerat."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cars data"
+                    },
+                    "403": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Cars",
+            "description": "Cars"
+        }
+    ]
+}

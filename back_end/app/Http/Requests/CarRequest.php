@@ -28,13 +28,13 @@ class CarRequest extends FormRequest
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             'color' => 'required|string|max:255',
             'engine' => 'required|string|max:255',
-            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable',
             'quantity' => 'required|integer|min:1',
             'mileage' => 'required|integer|min:0',
             'resduce' => 'required|integer|min:0',
             'stars' => 'required|integer|min:0|max:5',
             'price_per_day' => 'required|numeric|min:0',
-            'status' => 'required|in:available,rented,maintenance',
+            'status' => 'required|in:disponible,reserve,loue,maintenance',
             'description' => 'nullable|string',
         ];
     }

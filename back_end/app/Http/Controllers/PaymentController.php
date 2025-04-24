@@ -13,7 +13,12 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $payments = Payment::with(['reservation'])->get();
+            return response()->json($payments , 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**

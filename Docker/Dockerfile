@@ -15,3 +15,26 @@ RUN a2enmod rewrite
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
 CMD ["apache2-foreground"]
+
+
+# Dockerfile pour un projet React.js
+FROM node:16
+
+# Créer le répertoire de l'application dans le conteneur
+WORKDIR /app
+
+# Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier tous les autres fichiers du projet
+COPY . .
+
+# Exposer le port 3000 (par défaut pour React)
+EXPOSE 3000
+
+# Démarrer l'application
+CMD ["npm", "start"]
+
