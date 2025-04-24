@@ -24,11 +24,14 @@ function Reservations() {
 
     const openMultipForm = (res: any) => {
         updateState({ isOpen: true, reservation: res } )
+        console.log('reservation', res);
     }
 
     const closeMultiForm = () => {
         updateState({ isOpen: false } )
     }
+
+    
 
 
     return (

@@ -14,6 +14,7 @@ use App\Http\Controllers\CityController;
 
 
 Route::apiResource('/cars', controller: CarController::class)->middleware('auth.api');
+Route::get('/cars', [CarController::class, 'index']);
 Route::post('/cars/{car}', [CarController::class, 'update'])->middleware('auth.api');
 
 Route::apiResource('/reservations', ReservationController::class)->middleware('auth.api');
@@ -27,10 +28,11 @@ Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout'
 Route::post('/sendPasswordResetLink', [SendPasswordResetController::class, 'sendEmail'])->name('logout');
 Route::post('/resetPassword', [ChangePasswordController::class, 'passwordResetProcess'])->name('changePassword');
 
-
 Route::get('/user', [UserController::class, 'index'])->middleware('auth.api');
 Route::get('/cities', [CityController::class, 'index'])->middleware('auth.api');
 
 Route::post('addContract', [ReservationConfirmationController::class, 'store'])->middleware('auth.api');
-
 Route::post('uploadContract', [ReservationConfirmationController::class, 'uploadContractPdf'])->middleware('auth.api');
+
+// Nouvel endpoint pour récupérer toutes les confirmations de réservation
+Route::get('/reservation-confirmations', [ReservationConfirmationController::class, 'getAll'])->middleware('auth.api');

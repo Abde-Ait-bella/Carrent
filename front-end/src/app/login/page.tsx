@@ -65,14 +65,21 @@ export default function Login () {
             contentToast: 'Connexion réussie !',
             width: '22rem'
           })
-          Cookies.set('role', data.user_role, { expires: 7, secure: true })
-          Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
+          Cookies.set('user_role', data.user_role, { expires: 7, secure: true })
+          // Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
           if (state.values.remember) {
             localStorage.setItem('token', data.authorisation.token)
+            localStorage.setItem('role', data.user_role)
           } else {
+            console.log('data', data);
             sessionStorage.setItem('token', data.authorisation.token)
+            sessionStorage.setItem('role', data)
           }
+          if(data.user_role === 'admin') {
           window.location.href = '/dashboard'
+          }else {
+            window.location.href = '/'
+          }
           router.push('/dashboard');
         }
       })

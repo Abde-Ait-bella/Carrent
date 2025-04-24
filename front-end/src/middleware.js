@@ -4,20 +4,21 @@ import { NextResponse } from 'next/server'
 
 export function middleware (req) {
   // 🔹 Accéder aux cookies dans la requête (côté serveur)
-  const role = req.cookies.get('role')?.value
+  const role = req.cookies.get('user_role')?.value
+  
 
   // 🔹 Définir les routes protrdégées
-  const adminRoutes = ['/dashboard']
-  const userRoutes = ['/']
+  const adminRoutes = ['/dashboard', '/dashboard/reservations', '/dashboard/cars']
+  // const userRoutes = ['/']
 
   // 🔹 Vérification pour les pages admin
   if (adminRoutes.includes(req.nextUrl.pathname) && role !== 'admin') {
-    // return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas admin
+    return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas admin
   }
 
   // 🔹 Vérification pour les pages utilisateurs
   if (userRoutes.includes(req.nextUrl.pathname) && role !== 'user') {
-    // return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas user
+    return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas user
   }
 
   // 🔹 Si tout est bon, laisser passer la requête
@@ -25,5 +26,5 @@ export function middleware (req) {
 }
 
 export const config = {
-  matcher: ['/dashboard', '/'] // Appliquer à ces routes protégées
+  matcher: ['/dashboard'] // Appliquer à ces routes protégées
 }

@@ -98,14 +98,6 @@ const Formulair: React.FC<MyComponentProps> = ({
   React.useEffect(() => {
     form.reset(defaultValues) // Mettre à jour les valeurs du formulaire
   }, [defaultValues])
-
-  // const toggleDropdown = (id: any) => {
-  //   setDropdownd(dropdownId === id ? false : id)
-  // }hn
-
-  const [setTest, setStateTest] = React.useState<any>()
-
-  console.log('setTest', setTest);
   
   return (
     <>
@@ -335,6 +327,46 @@ const Formulair: React.FC<MyComponentProps> = ({
                                 )
                                   :
                                   field.type === 'select' ? (
+                                    <Select
+                                      onValueChange={value => {
+                                        controlledField.onChange(value)
+                                        setStatus(value)
+                                      }}
+                                      defaultValue={controlledField.value}
+                                    >
+                                      <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
+                                        <SelectValue
+                                          placeholder={
+                                            field.placeholder ||
+                                            `Sélectionner un ${field.placeholder}`
+                                          }
+                                        />
+                                        {field.label && !controlledField.value
+                                          ? `Select ${field.placeholder}...` : ''}
+                                      </SelectTrigger>
+                                      <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
+                                        {field.options &&
+                                          field.options
+                                            .filter(option => {
+                                              // Remove pending options if any field has value "confirmed"
+                                              const hasConfirmedField = Object.values(form.getValues()).includes("confirmed");
+                                              return !(hasConfirmedField && option.value === "pending");
+                                            })
+                                            .map((option: any, indexOption: any) => (
+                                              <SelectItem
+                                                key={option.value}
+                                                value={option.value}
+                                              >
+                                                <div className='flex items-center gap-3'>
+                                                  {option.label}
+                                                </div>
+                                              </SelectItem>
+                                            ))
+                                        }
+                                      </SelectContent>
+                                    </Select>
+                                  ) :
+                                  field.type === 'select' ? (
                                     // <Select
                                     //   value={controlledField.value}
                                     //   onValueChange={controlledField.onChange}
@@ -368,9 +400,9 @@ const Formulair: React.FC<MyComponentProps> = ({
                                     <Select
                                       onValueChange={value => {controlledField.onChange(value)
                                         setStatus(value)
-                                      }}
-                                      defaultValue={controlledField.value}
-                                    >
+                                        }}
+                                        defaultValue={controlledField.value}
+                                      >
                                       <SelectTrigger className='bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-lg text-gray-300 transition-colors'>
                                         <SelectValue
                                           placeholder={
@@ -378,9 +410,9 @@ const Formulair: React.FC<MyComponentProps> = ({
                                             `Sélectionner un ${field.placeholder}`
                                           }
                                         />
-                                        {/* {
-                                        field.label
-                                        ? `Select ${field.label}...` : 'select ...'} */}
+                                        {
+                                        field.label && !controlledField.value
+                                        ? `Select ${field.placeholder}...` : ''}
                                       </SelectTrigger>
                                       <SelectContent className='bg-gray-800 border border-gray-700 text-gray-300'>
 
@@ -390,9 +422,6 @@ const Formulair: React.FC<MyComponentProps> = ({
                                               <SelectItem
                                                 key={option.value}
                                                 value={option.value}
-                                                // onSelect={() => {
-                                                //   setStateTest("currentValue")
-                                                // }}
                                               >
                                                 <div className='flex items-center gap-3'>
                                                   {option.label}

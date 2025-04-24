@@ -27,7 +27,7 @@ const dashboardLayout = ({children}) => {
           <main className='overflow-y-auto'>
             <div className='grid mx-auto px-6 container'>
               <h2 className={`${poppins.variable} my-6 font-semibold text-[#CAE9FF] dark:text-gray-200 text-2xl`}>
-                Dashboard
+              Administrateur
               </h2>
               {/* <!-- CTA --> */}
 

@@ -22,7 +22,7 @@ api.interceptors.response.use(null, function(error) {
       localStorage.removeItem('user');
       localStorage.removeItem('AUTHENTICATED')
       localStorage.removeItem('token')
-      window.location.href = "/login";
+      // window.location.href = "/";
   }
   
   return Promise.reject(error);

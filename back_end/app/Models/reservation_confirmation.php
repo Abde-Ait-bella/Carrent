@@ -24,4 +24,9 @@ class reservation_confirmation extends Model
         'comprehensive_insurance',
         'contract_path'
     ];
+
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class, 'reservation_id');
+    }
 }
