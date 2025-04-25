@@ -367,7 +367,7 @@ function index() {
               <span class="ml-4">Cards</span>
             </a>
           </li>
-          <li class="relative px-6 py-3">
+          {/* <li class="relative px-6 py-3">
             <a
               class="inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150"
               href="charts.html"
@@ -389,7 +389,7 @@ function index() {
               </svg>
               <span class="ml-4">Charts</span>
             </a>
-          </li>
+          </li> */}
           <li class="relative px-6 py-3">
             <a
               class="inline-flex items-center w-full font-semibold hover:text-gray-800 dark:hover:text-gray-200 text-sm transition-colors duration-150"

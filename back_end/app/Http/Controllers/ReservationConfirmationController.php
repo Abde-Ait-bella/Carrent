@@ -55,7 +55,7 @@ class ReservationConfirmationController extends Controller
 
         // Validate the request data
         $validatedData = $request->validate([
-            'reservation_id' => 'required|exists:strokeWidth,id',
+            'reservation_id' => 'required|exists:reservations,id',
             'cin' => 'required|string',
             'rental_start' => 'required|date',
             'rental_end' => 'required|date',
@@ -120,20 +120,27 @@ class ReservationConfirmationController extends Controller
     {
         // Find the reservation confirmation
         $request->validate([
-            'reservation_id' => 'required|exists:reservation_confirmations,id',
+            'reservation_id' => 'required|exists:reservations,id',
             'contract_file' => '', // 5MB max size
         ]);
 
-        $confirmation = reservation_confirmation::findOrFail(1);
+        // First check if confirmation exists
+        $confirmation = reservation_confirmation::where('reservation_id', $request['reservation_id'])->first();
+        
+        if (!$confirmation) {
+            return response()->json([
+            'message' => 'Confirmation de réservation non trouvée',
+            'status' => 404,
+            ], 404);
+        }
 
-        // // Validate the request - make sure it has a PDF file
-
+        // Validate the request - make sure it has a PDF file
         if ($request->hasFile('contract_file')) {
             // Get the file
             $file = $request->file('contract_file');
 
             // Generate a unique filename
-            $filename = 'contract_' . $request['id'] . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'contract_' . $request->input('reservation_id') . '_' . time() . '.' . $file->getClientOriginalExtension();
 
             // Store the file in the storage/app/public/contracts directory
             $path = $file->storeAs('contracts', $filename, 'public');
@@ -145,14 +152,15 @@ class ReservationConfirmationController extends Controller
             // Update the related reservation status to confirmed
             $reservation = Reservation::find($confirmation->reservation_id);
             if ($reservation) {
-                $reservation->update(['state' => 'confirmed']);
+            $reservation->update(['state' => 'confirmed']);
             }
 
             return response()->json([
-                'message' => 'Fichier de contrat téléchargé avec succès',
-                'file_path' => $path,
-                'status' => 201,
-                'request' => $request->all()
+            'message' => 'Fichier de contrat téléchargé avec succès',
+            'file_path' => $path,
+            'confirmation' => $confirmation,
+            'contract_url' => url('storage/' . $path), // Ajouter l'URL complète
+            'status' => 201,
             ], 201);
         }
 
@@ -160,6 +168,23 @@ class ReservationConfirmationController extends Controller
             'message' => 'Aucun fichier trouvé',
             'status' => 400,
         ], 400);
+    }
+
+    /**
+     * Get all reservation confirmations
+     */
+    public function getAll()
+    {
+        $confirmations = reservation_confirmation::with(['reservation'])->get();
+        
+        foreach ($confirmations as $confirmation) {
+            // Ajouter l'URL complète du contrat si un chemin existe
+            if ($confirmation->contract_path) {
+                $confirmation->contract_url = str_replace('/api', '', url('storage/' . $confirmation->contract_path));
+            }
+        }
+        
+        return response()->json($confirmations, 200);
     }
 
     /**

@@ -71,13 +71,11 @@ export interface Car {
 
 interface CarsState {
   cars: Car[]
-  status: 'idle' | 'loading' | 'succeeded' | 'failed'
   error: string | null
 }
 
 const initialState: CarsState = {
   cars: [],
-  status: 'idle',
   error: null
 }
 
@@ -88,7 +86,6 @@ const carsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchCars.fulfilled, (state, action) => {
-        state.status = 'succeeded' // ✅ Succès
         state.cars = action.payload
       })
 

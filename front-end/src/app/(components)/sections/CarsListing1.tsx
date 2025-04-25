@@ -2,8 +2,24 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link"
 import { swiperGroup3 } from '@/util/swiperOptions'
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import { fetchCars } from '@/lib/features/carsSlice'
 
 export default function CarsListing1() {
+
+
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(fetchCars())
+	}, [])
+
+	const cars = useAppSelector((state) => state.cars.cars)
+
+	console.log('cars', cars);
+	
+
 	return (
 		<>
 
@@ -11,7 +27,7 @@ export default function CarsListing1() {
 				<div className="container">
 					<div className="align-items-end row">
 						<div className="col-md-9 wow fadeInUp">
-							<h3 className="mb-5 title-svg neutral-1000">Most Searched Vehicles</h3>
+							<h3 className="mb-5 title-svg neutral-1000">Vehicles</h3>
 							<p className="text-bold text-lg-medium neutral-500">The world's leading car brands</p>
 						</div>
 						<div className="position-relative mb-30 col-md-3 wow fadeInUp">

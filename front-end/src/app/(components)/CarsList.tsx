@@ -373,9 +373,9 @@ function CarsList() {
                 </tr>
               </thead>
               <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
-                {paginatedData.map((d: any, index: any) => (
+                {paginatedData.map((car, index) => (
                   <tr
-                    key={d.id || index}
+                    key={car.id || `car-${index}`}
                     className='text-gray-700 dark:text-gray-400'
                   >
                     <Tooltip.Provider>
@@ -388,12 +388,12 @@ function CarsList() {
                                 <p
                                   className={` text-[1.2rem] ${poppins.className}`}
                                 >
-                                  {d.brand}
+                                  {car.brand}
                                 </p>
                                 <p
                                   className={` text-gray-600 dark:text-gray-400 text-xs ${poppins.className}`}
                                 >
-                                  Quantity {d.quantity}
+                                  Quantity {car.quantity}
                                 </p>
                               </div>
                             </div>
@@ -409,26 +409,26 @@ function CarsList() {
                               <div className='rounded-t-lg h-44 overflow-hidden'>
                                 <img
                                   className='w-full object-cover object-top'
-                                  src={`http://127.0.0.1:8000/storage/${d.image}`}
+                                  src={`http://127.0.0.1:8000/storage/${car.image}`}
                                   alt='Mountain'
                                 />
                               </div>
                               <div className='mt-4 text-center'>
                                 <h2 className={`font-semibold capitalize ${poppins.className}`}>
-                                  Model : {d.model}
+                                  Model : {car.model}
                                 </h2>
                                 <p className={`text-gray-500 capitalize ${poppins.className}`}>
-                                  Moteur : {d.engine}
+                                  Moteur : {car.engine}
                                 </p>
                                 <p className='text-gray-500'>
-                                  Kelométrage : {d.mileage} Km
+                                  Kelométrage : {car.mileage} Km
                                 </p>
                               </div>
                               <div className='text-center'>
                                 <h6
                                   className={`flex mt-3 justify-center ${poppins.className}`}
                                 >
-                                  {Array.from({ length: d.stars }, v => (
+                                  {Array.from({ length: car.stars }, v => (
                                     <svg
                                       xmlns='http://www.w3.org/2000/svg'
                                       className='w-5 h-5 text-yellow-400'
@@ -441,13 +441,13 @@ function CarsList() {
                                 </h6>
                               </div>
                               <p className={`mx-8 mt-2 p-4 border-t ${poppins.className}`}>
-                                {d.description}
+                                {car.description}
                               </p>
                               <div className='mx-8 mt-2 flex gap-3 p-4 border-t'>
-                                <button onClick={() => toggleUpdate(d.id)} className='block bg-[#3A5A75] hover:shadow-lg mx-auto px-6 py-2 rounded-full w-1/2 font-semibold text-white'>
+                                <button onClick={() => toggleUpdate(car.id)} className='block bg-[#3A5A75] hover:shadow-lg mx-auto px-6 py-2 rounded-full w-1/2 font-semibold text-white'>
                                   Modifier
                                 </button>
-                                <button onClick={() => handelDelete(d.id)} className='block bg-[#ff8906] hover:shadow-lg mx-auto px-6 py-2 rounded-full w-1/2 font-semibold text-white'>
+                                <button onClick={() => handelDelete(car.id)} className='block bg-[#ff8906] hover:shadow-lg mx-auto px-6 py-2 rounded-full w-1/2 font-semibold text-white'>
                                   Delete
                                 </button>
                               </div>
@@ -459,26 +459,26 @@ function CarsList() {
                     </Tooltip.Provider>
 
                     <td className={`px-4 py-3 text-sm ${poppins.className}`}>
-                      {d.model} <span className='text-bold'>DH</span>
+                      {car.model} <span className='text-bold'>DH</span>
                     </td>
                     <td className={`px-4 py-3 text-sm ${poppins.className}`}>
-                      {d.model}
+                      {car.model}
                     </td>
                     <td className={`px-4 py-3 text-sm ${poppins.className}`}>
-                      {d.price_per_day}
+                      {car.price_per_day}
                     </td>
                     <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                       <span
                         className={`bg-green-100 ${quicksand.className} ${
-                          isReserved(d.id) === 'réservés'
+                          isReserved(car.id) === 'réservés'
                             ? 'dark:bg-green-700 bg-orange-200 text-orange-500'
-                            : isReserved(d.id) === 'Certains sont réservés' 
+                            : isReserved(car.id) === 'Certains sont réservés' 
                               ? 'bg-orange-100 text-orange-300' 
                               : "dark:bg-green-600 text-green-600 dark:text-green-100"
                         } px-2 py-1 rounded-full font-semibold leading-tight text-center whitespace-nowrap`}
                       >
                         {reservations ? (
-                          <span>{isReserved(d.id)}</span>
+                          <span>{isReserved(car.id)}</span>
                         ) : (
                           <span>Chargement...</span>
                         )}
@@ -486,13 +486,13 @@ function CarsList() {
                     </td>
 
                     <td ref={toggleRef} className='relative grid justify-center'>
-                      <button onClick={() => setToglleButtons(d.id)} className='mx-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 text-gray-600 hover:text-gray-800 hover:rotate-180 transition !duration-1000 ease-in-out'>
+                      <button onClick={() => setToglleButtons(car.id)} className='mx-2 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 text-gray-600 hover:text-gray-800 hover:rotate-180 transition !duration-1000 ease-in-out'>
                         <Ellipsis />
                       </button>
-                      <div id="dropdownHover" className={`${toggleButtons === d.id ? "" : "hidden"}  z-10 bg-[#CCE5F6] absolute right-26 dark:bg-gray-700 shadow-sm rounded-lg divide-y divide-gray-100`}>
+                      <div id="dropdownHover" className={`${toggleButtons === car.id ? "" : "hidden"}  z-10 bg-[#CCE5F6] absolute right-26 dark:bg-gray-700 shadow-sm rounded-lg divide-y divide-gray-100`}>
                         <ul className="py-1 font-font-medium text-gray-100 dark:text-gray-100 profile-dropdown" aria-labelledby="dropdownHoverButton">
                           <li>
-                            <button onClick={() => handelDelete(d.id)} className="block hover:bg-white dark:hover:bg-gray-600 px-2 py-1 hover:text-[#0E2540]">
+                            <button onClick={() => handelDelete(car.id)} className="block hover:bg-white dark:hover:bg-gray-600 px-2 py-1 hover:text-[#0E2540]">
                               <svg
                                 width='25px'
                                 height='25px'
@@ -539,7 +539,7 @@ function CarsList() {
                             </button>
                           </li>
                           <li>
-                            <button onClick={() => toggleUpdate(d.id)} className="block hover:bg-white dark:hover:bg-gray-600 flex justify-center w-full py-1 hover:text-[#0E2540]">
+                            <button onClick={() => toggleUpdate(car.id)} className="block hover:bg-white dark:hover:bg-gray-600 flex justify-center w-full py-1 hover:text-[#0E2540]">
                               <svg
                                 width='22px'
                                 height='22px'
@@ -604,9 +604,9 @@ function CarsList() {
                       Prev
                     </button>
                   </li>
-                  {Array.from({ length: totalPages }).map((t, index) => {
+                  {Array.from({ length: totalPages }).map((_, index) => {
                     return (
-                      <li key={index} className='mx-1'>
+                      <li key={`page-${index}`} className='mx-1'>
                         <button
                           onClick={() => setCurrentPage(index + 1)}
                           className={`flex justify-center items-center ${currentPage == index + 1
