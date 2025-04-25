@@ -8,6 +8,12 @@ import Marquee from 'react-fast-marquee'
 import ModalVideo from 'react-modal-video'
 import Slider from "react-slick"
 
+// Make sure styles are loaded
+import 'react-modal-video/css/modal-video.css'
+// Force Slick Carousel styles to be available
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }: any) => (
 	<button
 		{...props}
@@ -40,8 +46,19 @@ export default function CarsDetails1() {
 	const [slider2, setSlider2] = useState(null)
 
 	useEffect(() => {
-		setNav1(slider1)
-		setNav2(slider2)
+		// Reset sliders on page refresh/mount to ensure they initialize properly
+		setNav1(null);
+		setNav2(null);
+		setSlider1(null);
+		setSlider2(null);
+		
+		// Small delay to ensure DOM is ready
+		const timer = setTimeout(() => {
+			setNav1(slider1);
+			setNav2(slider2);
+		}, 100);
+		
+		return () => clearTimeout(timer);
 	}, [slider2, slider1])
 
 	const settingsMain = {
@@ -72,9 +89,37 @@ export default function CarsDetails1() {
 	const handleAccordion = (key: any) => {
 		setIsAccordion(prevState => prevState === key ? null : key)
 	}
+	
+	// Force re-apply styles on component mount
+	useEffect(() => {
+		// Force a small reflow to help with styling
+		const styleSheet = document.createElement('style');
+		styleSheet.textContent = `
+			.slick-slider { opacity: 0.99; }
+			.slick-slider:hover { opacity: 1; }
+		`;
+		document.head.appendChild(styleSheet);
+		
+		return () => {
+			document.head.removeChild(styleSheet);
+		};
+	}, []);
+	
 	return (
 		<>
-
+			{/* Import ModalVideo CSS to ensure it's loaded */}
+			<style jsx global>{`
+				.modal-video {
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					z-index: 1000;
+					background-color: rgba(0, 0, 0, 0.5);
+				}
+			`}</style>
+			
 			<Layout footerStyle={1}>
 				<div>
 					<section className="box-section box-breadcrumb background-body">

@@ -4,6 +4,8 @@ import carsSlice from './features/carsSlice'
 import reservationSlice from './features/reservationSlice'
 import paimentSlice from './features/paimentSlice'
 import citiesSlice from './features/citiesSlice'
+import reservationFormSlice from './features/reservationFormSlice'
+import userSlice from './features/userSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -12,7 +14,9 @@ export const makeStore = () => {
         cars: carsSlice,
         reservation: reservationSlice,
         paiment: paimentSlice,
-        cities : citiesSlice
+        cities : citiesSlice,
+        reservationForm: reservationFormSlice,
+        user: userSlice
     },
   })
 }

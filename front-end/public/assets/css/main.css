@@ -78,7 +78,7 @@ TABLE CONTENT
 	--bs-button-text: #101010;
 	--bs-button-text-2: #000000;
 	--bs-brand-2: #1B4569;
-	--bs-brand-2-dark: #70f46d;
+	--bs-brand-2-dark: #292929;
 	--bs-brand-2-darken: #5edd5b;
 	--bs-brand-2-light: #2d4a2c;
 	--bs-link-hover-color: #235922;
@@ -2695,7 +2695,7 @@ label {
 	font-weight: 700;
 	border: 1px solid var(--bs-border-color);
 	box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.07);
-	background-image: url(../imgs/template/icons/star.svg);
+	/* background-image: url(../imgs/template/icons/star.svg); */
 	background-repeat: no-repeat;
 	background-position: left 12px center;
 }
@@ -2889,7 +2889,7 @@ label {
 	font-weight: 500;
 	border: 1px solid var(--bs-border-color);
 	box-shadow: 0px 2px 7px 0px rgba(0, 0, 0, 0.07);
-	background-image: url(../imgs/template/icons/star.svg);
+	background-image: url(../imgs/template/icons/star-yellow.svg);
 	background-repeat: no-repeat;
 	background-position: left 10px center;
 }
@@ -2918,7 +2918,7 @@ label {
 }
 
 .card-journey-small .card-info .card-program .card-location .text-location {
-	background: url(../imgs/template/icons/location.svg) no-repeat left center;
+	/* background: url(../imgs/template/icons/location.svg) no-repeat left center; */
 	padding-left: 20px;
 }
 
@@ -2955,7 +2955,7 @@ label {
 }
 
 .card-journey-small .card-info .card-program .card-facitlities .card-fuel {
-	background: url(../imgs/template/icons/fuel.svg) no-repeat left center;
+	/* background: url(../imgs/template/icons/fuel.svg) no-repeat left center; */
 }
 
 .card-journey-small .card-info .card-program .card-facitlities .card-seat {

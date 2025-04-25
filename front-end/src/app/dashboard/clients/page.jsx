@@ -16,7 +16,10 @@ function page () {
     fetchReservations()
   }, [])
 
-  const uniqueReservations = reservations.filter(
+  // Make sure we only work with reservations that have valid user objects
+  const filteredReservations = reservations.filter(reser => reser && reser.user)
+
+  const uniqueReservations = filteredReservations.filter(
     (reser, index, self) =>
       index === self.findIndex(u => u.id === reser.user_id)
   )
@@ -31,15 +34,10 @@ function page () {
     startIndex + itemsPerPage
   )
 
-  const lengthreser = reservations.map(r => {
-    reservations.find(res => res.user.id == r.user.id)
-  })
-
-  console.log(
-    reservations.map(r => {
-      reservations.find(res => res.user.id == r.user.id)
-    }).length
-  )
+  // Fix the lengthreser by counting the actual reservations properly
+  const countUserReservations = (userId) => {
+    return filteredReservations.filter(res => res.user && res.user.id === userId).length
+  }
 
   return (
     <div className='shadow-lg rounded-lg w-full overflow-hidden'>
@@ -63,7 +61,7 @@ function page () {
           </thead>
           <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
             {paginatedData.length > 0 ? (
-              paginatedData.map(d => (
+              paginatedData.map((d, index) => (
                 <tr
                   key={d.id || index}
                   className='text-gray-700 dark:text-gray-400'
@@ -85,24 +83,24 @@ function page () {
                       </div>
                       <div>
                         <p className={` text-lg ${poppins.className}`}>
-                          {d.user.name}
+                          {d.user?.name || "Client"}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                     <span>
-                      {formatDistanceToNow(new Date(d.created_at), {
+                      {formatDistanceToNow(new Date(d.created_at || Date.now()), {
                         addSuffix: true,
                         locale: fr
                       })}
                     </span>
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
-                    {lengthreser.length}{' '}
+                    {d.user ? countUserReservations(d.user.id) : 0}{' '}
                     <span className='text-bold'>
                       Reservation
-                      {lengthreser.length > 1 ? 's' : ''}
+                      {d.user && countUserReservations(d.user.id) > 1 ? 's' : ''}
                     </span>
                   </td>
 
@@ -141,8 +139,8 @@ function page () {
                                 />
                               </div>
                               <div class='mt-2 text-center'>
-                                <h2 class='font-semibold'>{d.user.name}</h2>
-                                <p class='text-gray-500'>{d.user.email}</p>
+                                <h2 class='font-semibold'>{d.user?.name || "Client"}</h2>
+                                <p class='text-gray-500'>{d.user?.email || ""}</p>
                               </div>
                               <div className='text-center'>
                                 <h6 className={` mt-3 ${poppins.className}`}>
