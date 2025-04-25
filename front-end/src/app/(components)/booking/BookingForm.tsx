@@ -113,7 +113,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     user_phone: "",
 
   }
-  
 
   const form = useForm({
     resolver: zodResolver(formSchema),
