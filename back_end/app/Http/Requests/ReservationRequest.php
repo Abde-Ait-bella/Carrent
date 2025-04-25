@@ -11,7 +11,7 @@ class ReservationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,13 +22,13 @@ class ReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
             'car_id' => 'required|exists:cars,id',
             'rental_start' => 'required|date',
             'rental_end' => 'required|date|after:rental_start',
             'daily_rate' => 'required|numeric|min:0',
-            'final_price' => 'required|numeric|min:0',
+            // 'total_price' => 'required|numeric|min:0',
             'state' => 'required|in:pending,confirmed,canceled,completed',
+            'user_phone' => 'nullable',
         ];
     }
 }

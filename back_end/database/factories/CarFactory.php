@@ -26,7 +26,6 @@ class CarFactory extends Factory
             'image' => 'cars/default.jpg', // Vous pouvez modifier pour utiliser une image dynamique
             'quantity' => $this->faker->numberBetween(1, 10),
             'mileage' => $this->faker->numberBetween(5000, 20000),
-            'resduce' => $this->faker->numberBetween(1, 10),
             'stars' => $this->faker->numberBetween(1, 5),
             'price_per_day' => $this->faker->randomFloat(2, 20, 100),
             'status' => $this->faker->randomElement(['disponible', 'reserve', 'loue', 'maintenance']),

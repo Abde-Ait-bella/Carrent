@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server'
 export function middleware (req) {
   // 🔹 Accéder aux cookies dans la requête (côté serveur)
   const role = req.cookies.get('user_role')?.value
-  
 
   // 🔹 Définir les routes protrdégées
   const adminRoutes = ['/dashboard', '/dashboard/reservations', '/dashboard/cars']
@@ -17,9 +16,9 @@ export function middleware (req) {
   }
 
   // 🔹 Vérification pour les pages utilisateurs
-  if (userRoutes.includes(req.nextUrl.pathname) && role !== 'user') {
-    return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas user
-  }
+  // if (userRoutes.includes(req.nextUrl.pathname) && role !== 'user') {
+  //   return NextResponse.redirect(new URL('/', req.url)) // Redirection si le rôle n'est pas user
+  // }
 
   // 🔹 Si tout est bon, laisser passer la requête
   return NextResponse.next()

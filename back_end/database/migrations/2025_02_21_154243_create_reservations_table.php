@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('rental_end');
             $table->decimal('daily_rate', 10, 2);
             $table->decimal('final_price', 10, 2);
+            $table->string('user_phone');
             $table->enum('state', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending');
             $table->timestamps();
         });

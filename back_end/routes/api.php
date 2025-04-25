@@ -17,7 +17,8 @@ Route::apiResource('/cars', controller: CarController::class)->middleware('auth.
 Route::get('/cars', [CarController::class, 'index']);
 Route::post('/cars/{car}', [CarController::class, 'update'])->middleware('auth.api');
 
-Route::apiResource('/reservations', ReservationController::class)->middleware('auth.api');
+// Route::apiResource('/reservations', ReservationController::class)->middleware('auth.api');
+Route::post('/reservations', [ReservationController::class, 'Store']);
 Route::put('/reservations/{reservation}', [ReservationController::class, "upadatetState"])->middleware('auth.api');
 
 Route::apiResource('/payments', PaymentController::class)->middleware('auth.api');

@@ -16,7 +16,8 @@ class Reservation extends Model
         'rental_start',
         'rental_end',
         'daily_rate',
-        'final_price',
+        'total_price',
+        'user_phone',
         'state',
     ];
 

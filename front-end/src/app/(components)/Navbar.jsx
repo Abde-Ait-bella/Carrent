@@ -5,6 +5,8 @@ import api from "../Api/axios";
 import "../globals.css";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
+
 
 function Navbar () {
 
@@ -14,13 +16,14 @@ function Navbar () {
     const handelSubmit = async () => {
       setClick(!click)
       await api
-        .post('/logout')
-        .then(response => {
-          const { status, data } = response
-          
-          if (status === 200) {
-            toast.success(data.status)
-            router.push('/');
+      .post('/logout')
+      .then(response => {
+        const { status, data } = response
+        
+        if (status === 200) {
+          toast.success(data.status)
+          router.push('/');
+          Cookies.remove('user_role');
           }
         })
         .catch(({ response }) => {

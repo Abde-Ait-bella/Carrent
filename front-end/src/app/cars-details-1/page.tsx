@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import Marquee from 'react-fast-marquee'
 import ModalVideo from 'react-modal-video'
 import Slider from "react-slick"
+
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }: any) => (
 	<button
 		{...props}
