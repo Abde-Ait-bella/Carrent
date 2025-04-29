@@ -1,20 +1,19 @@
 'use client'
-import { useState } from 'react'
 import { useAppSelector, useAppDispatch } from '@/lib/hooks'
-import { closeReservationForm } from '@/lib/features/reservationFormSlice'
+import { closereservation } from '@/lib/features/reservationSlice'
 import BookingFormWrapper from './BookingFormWrapper'
 
 export default function BookingPage() {
   const dispatch = useAppDispatch()
-  const { isOpen, selectedCarId } = useAppSelector(state => state.reservationForm)
+  const { isFormOpen, selectedCarId } = useAppSelector(state => state.reservation)
   
   const handleClose = () => {
-    dispatch(closeReservationForm())
+    dispatch(closereservation())
   }
   
   return (
     <BookingFormWrapper 
-      isOpen={isOpen} 
+      isOpen={isFormOpen} 
       carId={selectedCarId}
       onClose={handleClose}
     />

@@ -4,32 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReservationRequest;
 use App\Models\Reservation;
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class ReservationController extends Controller
 {
+    /**
+     * Get reservations for the current authenticated user
+     */
+    public function getUserReservations()
+    {
+        $this->authorize('viewOwn', Reservation::class);
+
+        $user = Auth::user();
+
+        $reservations = Reservation::with(['car'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($reservations);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reservations = Reservation::with(['user', 'car'])->get();
+        $this->authorize('viewAny', Reservation::class);
+
+        // Récupérer toutes les réservations (pour admin)
+        $reservations = Reservation::with(['user', 'car'])->latest()->get();
+
         return response()->json($reservations);
-    }
-
-    /** 
-     * Show the form for creating a new resource.
-     */
-    public function upadatetState(Reservation $reservation, Request $request)
-    {
-
-        $reservation->state = $request->state;
-        $reservation->save();
-        return response()->json($request->state, 200);
-        // return response()->json($reservation->load(['user', 'car']), 200);
-
     }
 
     /**
@@ -37,88 +44,97 @@ class ReservationController extends Controller
      */
     public function store(ReservationRequest $request)
     {
-        // Vérifier si l'utilisateur est authentifié
+        // Vérifier si l'utilisateur est connecté
         if (!Auth::check()) {
-            // Tenter de connecter l'utilisateur avec les informations fournies
-            $credentials = $request->only('email', 'password');
-            if (!Auth::attempt($credentials)) {
-                // Check if the user exists with the provided email
-                $user = \App\Models\User::where('email', $request->email)->first();
-                if (!$user) {
-                    // User doesn't exist, create a new user
-                    $user = \App\Models\User::create([
-                        'email' => $request->email,
-                        'password' => bcrypt('password'),
-                        'name' => $request->name ?? 'New User', // Default name if not provided
-                    ]);
-
-                    // Authenticate the newly created user
-                    Auth::login($user);
-                } else {
-                    return response()->json(['message' => 'Identifiants incorrects. Veuillez vous connecter.'], 401);
-                }
+            // Chercher user par email
+            $user = User::where('email', $request->email)->first();
+    
+            if (!$user) {
+                // Créer un nouvel utilisateur
+                $user = User::create([
+                    'email' => $request->email,
+                    'password' => bcrypt('password'), // mot de passe temporaire
+                    'name' => $request->name ?? 'New User',
+                ]);
+    
+                $credentials = [
+                    'email' => $request->email,
+                    'password' => 'password', // parce qu'on a mis bcrypt('password')
+                ];
+            } else {
+                // Utilisateur existe, on doit utiliser le mot de passe fourni par le formulaire
+                $credentials = [
+                    'email' => $request->email,
+                    'password' => $request->password,
+                ];
             }
+    
+            // Authentifier et récupérer le token
+            $token = Auth::attempt($credentials);
+    
+            if (!$token) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Identifiants incorrects.',
+                ], 403);
+            }
+        } else {
+            // L'utilisateur est déjà connecté, donc pas besoin de créer un token
+            $token = auth()->refresh(); // ou utiliser un token existant si dispo
         }
-
-        // Récupérer les données validées
+    
+        // Maintenant, l'utilisateur est connecté
         $validated = $request->validated();
-
-        // Ajouter l'ID de l'utilisateur authentifié aux données de réservation
         $validated['user_id'] = Auth::id();
-        // Extract rental start and end dates
+    
         $rentalStart = new \DateTime($validated['rental_start']);
         $rentalEnd = new \DateTime($validated['rental_end']);
-
-        // Calculate the difference in days
-        $interval = $rentalStart->diff($rentalEnd);
-        $days = $interval->days;
-
-        // Add the calculated days to the validated data
+    
+        $days = $rentalStart->diff($rentalEnd)->days;
+    
         $validated['total_price'] = $days * $validated['daily_rate'];
-        // Get the authenticated user
-        $user = Auth::user();
-
-        // Créer la réservation  
+    
+        // Créer la réservation
         $reservation = Reservation::create($validated);
-
-        return response()->json(['reservation' => $reservation, 'status' => 201, 'user' => $user], 201); // 201 Created
+    
+        return response()->json([
+            'reservation' => $reservation,
+            'status' => 201,
+            'user' => Auth::user(),
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
+        ], 201);
     }
-
-    /****
-     * Display the specified resource.play the specified resource.
+    
+    /**
+     * Display the specified resource.
      */
     public function show(Reservation $reservation)
     {
-        //
+        // $this->authorize('view', $reservation);
+
+        // return response()->json($reservation->load(['user', 'car']));
     }
 
-    /****
-     * Show the form for editing the specified resource.w the form for editing the specified resource.
+    /**
+     * Update the specified resource in storage.
      */
-    public function edit(Reservation $reservation)
+    public function update(Request $request, Reservation $reservation)
     {
-        //
+        // $this->authorize('update', $reservation);
+
+        // Logique pour mettre à jour une réservation
     }
 
-    /****
-     * Update the specified resource in storage.rage.
-     */
-    public function update(ReservationRequest $request, Reservation $reservation)
-    {
-        $validated = $request->validated();
-        $validated = $request->validated();
-        $reservation->update($validated);
-        $reservation->update($validated);
-        return response()->json($reservation, 204);
-        ;
-    }
-
-    /****
-     * Remove the specified resource from storage.ource from storage.
+    /**
+     * Remove the specified resource from storage.
      */
     public function destroy(Reservation $reservation)
     {
-        $reservation->delete();
-        return response()->json(['message' => 'Reservation deleted successfully']);
+        // $this->authorize('delete', $reservation);
+
+        // Logique pour supprimer une réservation
     }
 }

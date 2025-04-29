@@ -13,7 +13,7 @@ interface Reservation {
 }
 
 export const createReservation = createAsyncThunk(
-  'reservationForm/createReservation',
+  'reservation/createReservation',
   async (reservationData: any) => {
     // Convert dates to ISO strings for API
     const dataToSend = {
@@ -32,22 +32,40 @@ export const createReservation = createAsyncThunk(
   }
 )
 
-const reservationFormSlice = createSlice({
-  name: 'reservationForm',
+// Ajouter cette nouvelle action async thunk
+export const fetchUserReservations = createAsyncThunk(
+  'reservation/fetchUserReservations',
+  async () => {
+    try {
+      const response = await api.get('/reservations');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user reservations:', error);
+      throw error;
+    }
+  }
+)
+
+const reservationSlice = createSlice({
+  name: 'reservation',
   initialState: {
     isOpen: false,
     selectedCarId: null as number | null,
     status: 'idle',
-    error: null as string | null
+    error: null as string | null,
+    // Ajouter ces nouvelles propriétés pour les réservations d'utilisateur
+    userReservations: [] as Reservation[],
+    userReservationsStatus: 'idle',
+    userReservationsError: null as string | null
   },
   reducers: {
-    openReservationForm: (state, action) => {
+    openreservation: (state, action) => {
       state.isOpen = true;
       state.selectedCarId = action.payload;
       state.status = 'idle';
       state.error = null;
     },
-    closeReservationForm: (state) => {
+    closereservation: (state) => {
       state.isOpen = false;
       state.selectedCarId = null;
       state.status = 'idle';
@@ -65,9 +83,22 @@ const reservationFormSlice = createSlice({
       .addCase(createReservation.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Unknown error occurred';
+      })
+      // Ajouter ces gestionnaires pour l'action fetchUserReservations
+      .addCase(fetchUserReservations.pending, (state) => {
+        state.userReservationsStatus = 'loading';
+        state.userReservationsError = null;
+      })
+      .addCase(fetchUserReservations.fulfilled, (state, action) => {
+        state.userReservationsStatus = 'succeeded';
+        state.userReservations = action.payload;
+      })
+      .addCase(fetchUserReservations.rejected, (state, action) => {
+        state.userReservationsStatus = 'failed';
+        state.userReservationsError = action.error.message || 'Unknown error occurred';
       });
   },
 });
 
-export const { openReservationForm, closeReservationForm } = reservationFormSlice.actions;
-export default reservationFormSlice.reducer;
+export const { openreservation, closereservation } = reservationSlice.actions;
+export default reservationSlice.reducer;

@@ -68,12 +68,7 @@ export default function Login () {
             contentToast: 'Connexion réussie !',
             width: '22rem'
           })
-          
-          // Utiliser Redux pour stocker les infos utilisateur
-          
-          // Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
-          
-          // if (state.values.remember) {
+
             dispatch(setUserData({
               id: data.user.id,
               name: data.user.name,
@@ -83,12 +78,6 @@ export default function Login () {
               remember : state.values.remember,
               autenticated: true
             }))
-            //   localStorage.setItem('token', data.authorisation.token)
-          //   localStorage.setItem('role', data.user_role)
-          // } else {
-          //   sessionStorage.setItem('token', data.authorisation.token)
-          //   sessionStorage.setItem('role', data.user_role)
-          // }
           
           if(data.user_role === 'admin') {
             window.location.href = '/dashboard'

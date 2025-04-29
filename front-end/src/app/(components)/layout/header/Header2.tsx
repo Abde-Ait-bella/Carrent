@@ -10,7 +10,7 @@ export default function Header2({ scroll, isMobileMenu, handleMobileMenu, handle
 	return (
 		<>
 			<header className={`header sticky-bar header-home-2 ${scroll ? 'stick' : ''}`}>
-				<div className="top-bar top-bar-2 top-bar-3 @@bg">
+				{/* <div className="top-bar top-bar-2 top-bar-3 @@bg">
 					<div className="container-fluid">
 						<div className="flex text-header-info">
 							<Link className="flex items-center text-white phone-head" href="/tel:123-456-7890">
@@ -65,7 +65,7 @@ export default function Header2({ scroll, isMobileMenu, handleMobileMenu, handle
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> */}
 				<div className="container-fluid background-body">
 					<div className="main-header">
 						<div className="header-left">
@@ -168,14 +168,14 @@ export default function Header2({ scroll, isMobileMenu, handleMobileMenu, handle
 									</Link>
 									<Link className="text-dark btn btn-signin background-brand-2" href="#">Add Listing</Link>
 								</div>
-								<div className="burger-icon-2 burger-icon-white" onClick={handleOffcanvas}>
+								{/* <div className="burger-icon-2 burger-icon-white" onClick={handleOffcanvas}>
 									<img src="/assets/imgs/template/icons/menu.svg" alt="Carento" />
 								</div>
 								<div className="burger-icon burger-icon-white" onClick={handleMobileMenu}>
 									<span className="burger-icon-top" />
 									<span className="burger-icon-mid"> </span>
 									<span className="burger-icon-bottom"> </span>
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</div>

@@ -1,4 +1,5 @@
 import { ToastContainer, toast } from 'react-toastify';
+import { useEffect, useRef } from 'react';
 
 interface MyComponentProps {
   type?: string; 
@@ -7,39 +8,52 @@ interface MyComponentProps {
 }
 
 const ToastNotification : React.FC<MyComponentProps> = ({type , content, width}) => {
+  // Référence pour éviter les affichages multiples
+  const toastDisplayed = useRef(false);
   
-    switch(type) {
-      case 'success':
-        // toast.success("Nous vous avons envoyé un lien pour réinitialiser votre mot de passe. Vérifiez votre adresse e-mail.", {
-        toast.success(content, {
-          theme: "colored",
-          style: { background: '#8cb369', color: '#F2F9FE', width:  width || '25rem' }
-        });
-        break;
-      case 'error':
-        toast.error(content, {
-            style: { color: "#e07a5f", width:  width || '25rem' },
+  useEffect(() => {
+    // Seulement afficher la notification si elle n'a pas déjà été affichée
+    if (type && content && !toastDisplayed.current) {
+      toastDisplayed.current = true;
+      
+      switch(type) {
+        case 'success':
+          toast.success(content, {
+            theme: "colored",
+            style: { background: '#8cb369', color: '#F2F9FE', width: width || '25rem' }
+          });
+          break;
+        case 'error':
+          toast.error(content, {
+            style: { color: "#e07a5f", width: width || '25rem' },
             theme: 'dark'
-        });
-        break;
-      case 'info':
-        toast.info("Voici une notification d'information.", {
-          theme: "colored",
-          style: { background: "#5BC0DE", color: "#F2F9FE", width:  width || '25rem' }
-        });
-        break;
-      case 'warning':
-        toast.warning("Attention, quelque chose ne va pas.", {
-          theme: "colored",
-          style: { background: "#F0AD4E", color: "#F2F9FE", width:  width || '25rem' }
-        });
-        break;
-      default:
-        null
+          });
+          break;
+        case 'info':
+          toast.info(content, {
+            theme: "colored",
+            style: { background: "#5BC0DE", color: "#F2F9FE", width: width || '25rem' }
+          });
+          break;
+        case 'warning':
+          toast.warning(content, {
+            theme: "colored",
+            style: { background: "#F0AD4E", color: "#F2F9FE", width: width || '25rem' }
+          });
+          break;
+        default:
+          break;
+      }
     }
+    
+    // Réinitialiser le suivi pour permettre d'afficher une nouvelle notification si les props changent
+    return () => {
+      toastDisplayed.current = false;
+    };
+  }, [type, content, width]);
 
   return (
-      <ToastContainer />
+    <ToastContainer />
   );
 };
 

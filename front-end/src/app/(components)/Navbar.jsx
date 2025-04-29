@@ -134,13 +134,7 @@ function Navbar () {
                         <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Dashboard</Link>
                       </li>
                       <li>
-                        <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Settings</Link>
-                      </li>
-                      <li>
-                        <Link onClick={()=>setClick(!click)} href="#" className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 hover:text-[#0E2540]">Earnings</Link>
-                      </li>
-                      <li>
-                        <button onClick={handelSubmit}  className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 w-full hover:text-[#0E2540] text-start">Sign out</button>
+                        <button onClick={handelSubmit}  className="block hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 w-full hover:text-red-500 text-start">Sign out</button>
                       </li>
                       </ul>
                     </div>

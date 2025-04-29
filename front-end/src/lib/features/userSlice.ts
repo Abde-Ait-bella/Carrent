@@ -31,12 +31,12 @@ export const fetchUserData = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             
-            const id = Cookies.get('user_id') || localStorage.getItem('user_id');
-            const name = Cookies.get('user_name') || localStorage.getItem('user_name');
-            const email = Cookies.get('user_email') || localStorage.getItem('user_email');
-            const role = Cookies.get('user_role') || localStorage.getItem('user_role');
-            const token = Cookies.get('user_token') || localStorage.getItem('user_token');
-            const autenticated = Cookies.get('AUTHENTICATED') || localStorage.getItem('AUTHENTICATED');
+            const id = Cookies.get('user_id') ;
+            const name = Cookies.get('user_name') ;
+            const email = Cookies.get('user_email') ;
+            const role = Cookies.get('user_role') ;
+            const token = Cookies.get('user_token') ;
+            const autenticated = Cookies.get('AUTHENTICATED') ;
             
             const userData = { id, name, email, role, token, autenticated };
 
@@ -58,7 +58,6 @@ const userSlice = createSlice({
     reducers: {
         // Action pour définir manuellement les informations utilisateur
         setUserData: (state, action: PayloadAction<{id: string, name: string, email: string, role: string, token: string , autenticated: boolean, remember: boolean}>) => {
-
             state.id = action.payload.id;
             state.name = action.payload.name;
             state.email = action.payload.email;
@@ -74,12 +73,12 @@ const userSlice = createSlice({
                 Cookies.set('user_token', action.payload.token, { expires: 7 });
                 Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
             }else{
-                localStorage.setItem('user_id', action.payload.id);
-                localStorage.setItem('user_name', action.payload.name);
-                localStorage.setItem('user_email', action.payload.email);
-                localStorage.setItem('user_role', action.payload.role);
-                localStorage.setItem('user_token', action.payload.token);
-                localStorage.setItem('AUTHENTICATED', String(true))
+                Cookies.set('user_id', action.payload.id);
+                Cookies.set('user_name', action.payload.name);
+                Cookies.set('user_email', action.payload.email);
+                Cookies.set('user_role', action.payload.role);
+                Cookies.set('user_token', action.payload.token);
+                Cookies.set('AUTHENTICATED', String(true), { secure: true });
             }
 
         },
@@ -98,12 +97,6 @@ const userSlice = createSlice({
             Cookies.remove('user_role');
             Cookies.remove('user_token');
             Cookies.remove('AUTHENTICATED');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('user_name');
-            localStorage.removeItem('user_email');
-            localStorage.removeItem('user_role');
-            localStorage.removeItem('user_token');
-            localStorage.removeItem('AUTHENTICATED');
         },
     },
     extraReducers: (builder) => {

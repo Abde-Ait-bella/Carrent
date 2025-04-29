@@ -17,13 +17,41 @@ const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
 const currentYear = 2025; // Static year to avoid hydration mismatch
 
+interface CarStateType {
+  cars: any[] | null;
+  isOpen: boolean | null;
+  isOpenUppdate: boolean | null;
+  formTitle: string;
+  car: any;
+  status: string;
+  typeToast: string | null;
+  contentToast: string | null;
+  width: string | null;
+  defaultValues: {
+    brand: string;
+    model: string;
+    registration_number: string;
+    year: number;
+    color: string;
+    engine: string;
+    quantity: number;
+    mileage: number;
+    resduce: number;
+    stars: number;
+    price_per_day: number;
+    status: string;
+    description: string;
+  };
+}
+
 function CarsList() {
 
-  const [state, setState] = useState<any>({
+  const [state, setState] = useState<CarStateType>({
+    cars: null, // Added missing cars property
     isOpen: null,
     isOpenUppdate: null,
     formTitle: "",
-    car: "",
+    car: null, // Changed from string to proper null value
     status: "",
     typeToast: null,
     contentToast: null,
@@ -32,7 +60,7 @@ function CarsList() {
       brand: '',
       model: '',
       registration_number: '',
-      year: currentYear, // Updated
+      year: currentYear,
       color: '',
       engine: '',
       quantity: 1,
@@ -48,6 +76,13 @@ function CarsList() {
   const [valueStars, setValueStars] = useState()
   const [valueStatus, setValueStatus] = useState()
 
+  const updateState = (newState: Partial<typeof state>) => {
+    setState((prevState: any) => ({
+      ...prevState,
+      ...newState
+    }))
+  }
+
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -62,7 +97,17 @@ function CarsList() {
       document.removeEventListener("click", handleClickOutside);
     }
     return () => document.removeEventListener("click", handleClickOutside);
-  }, [toggleButtons])
+  }, [toggleButtons, dispatch])
+
+  const { cars } = useAppSelector(state => state.cars)
+  const { reservations } = useAppSelector(state => state.reservation)
+
+  useEffect(() => {
+    if (cars) {
+      updateState({ cars: cars });
+
+    }
+  }, [cars])
 
   const formSchema = z.object({
     brand: z.string().min(1, 'La marque est requise'),
@@ -78,7 +123,6 @@ function CarsList() {
     }).optional(),
     quantity: z.coerce.number().min(1, 'Quantité invalide'),
     mileage: z.coerce.number().min(0, 'Kilométrage invalide'),
-    resduce: z.coerce.number().min(0, 'Réduction invalide'),
     stars: z.coerce
       .number()
       .min(0)
@@ -89,34 +133,107 @@ function CarsList() {
       .min(10, 'La description doit contenir au moins 10 caractères')
   })
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     const dataFinale = { ...data, status: valueStatus, stars: valueStars }
 
-    dispatch(addCar(dataFinale))
-    updateState({ isOpen: false })
+    try {
+      const resutl = await dispatch(addCar(dataFinale)).unwrap()
+      updateState({ isOpen: false })
+
+      if (resutl.status == 201) {
+        // Effacer d'abord toute notification existante
+        updateState({
+          isOpenUppdate: false,
+          typeToast: null,
+          contentToast: null,
+          width: null
+        });
+
+        // Attendre que React termine son cycle de rendu
+        setTimeout(() => {
+          updateState({
+            typeToast: 'success',
+            contentToast: 'Voiture modifiée avec succès',
+            width: '22rem'
+          })
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout:', error);
+      updateState({
+        typeToast: 'error',
+        contentToast: 'Erreur lors de l\'ajout',
+        width: '22rem'
+      })
+    }
   }
 
-  const onUpdateSubmit = (data: any) => {
-    const dataFinale = { ...data, status: state.status }
+  const onUpdateSubmit = async (data: any) => {
+    // Création d'un objet avec les données complètes
+    const dataFinale = {
+      ...data,
+      status: state.status,
+      // Assurez-vous que l'image reste inchangée si aucune nouvelle image n'est sélectionnée
+      ...(data.image instanceof File && data.image.size > 0 ? {} : { image: undefined })
+    }
 
-    dispatch(updateCar({ newCar: dataFinale, id: state.car[0]?.id }))
-    updateState({ isOpenUppdate: false })
+    try {
+      const result = await dispatch(updateCar({ newCar: dataFinale, id: state.car[0]?.id })).unwrap()
+
+      if (result.status === 200) {
+        // Actualiser la liste des voitures après la mise à jour
+        dispatch(fetchCars());
+
+        // Effacer d'abord toute notification existante
+        updateState({
+          isOpenUppdate: false,
+          typeToast: null,
+          contentToast: null,
+          width: null
+        });
+
+        // Attendre que React termine son cycle de rendu
+        setTimeout(() => {
+          updateState({
+            typeToast: 'success',
+            contentToast: 'Voiture modifiée avec succès',
+            width: '22rem'
+          })
+        }, 100);
+
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+
+      // Effacer d'abord toute notification existante
+      updateState({
+        typeToast: null,
+        contentToast: null,
+        width: null
+      });
+
+      // Attendre que React termine son cycle de rendu
+      setTimeout(() => {
+        updateState({
+          typeToast: 'error',
+          contentToast: 'Erreur lors de la modification',
+          width: '22rem'
+        })
+      }, 100);
+    }
   }
-
-  const { cars } = useAppSelector(state => state.cars)
-  const { reservations } = useAppSelector(state => state.reservation)
 
   const isReserved = (id: any) => {
     const reserved = reservations?.filter(
       (r: any) => r.car_id == id && r.state === 'confirmed'
     )
     const reservedAll = cars?.find(
-      c => c.id === id && c.quantity === reserved.length
+      c => c.id === id && c.quantity === reserved?.length
     )
 
     return reservedAll
       ? 'réservés'
-      : reserved.length > 0
+      : reserved?.length > 0
         ? 'Certains sont réservés'
         : 'Disponible'
   }
@@ -124,23 +241,16 @@ function CarsList() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  const totalPages = Math.ceil(cars.length / itemsPerPage)
+  const totalPages = Math.ceil(state.cars?.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedData = cars.slice(startIndex, startIndex + itemsPerPage)
-
-  const updateState = (newState: Partial<typeof state>) => {
-    setState((prevState: any) => ({
-      ...prevState,
-      ...newState
-    }))
-  }
+  const paginatedData = state.cars?.slice(startIndex, startIndex + itemsPerPage)
 
   const openDialog = () => updateState({
     isOpen: true, isOpenUppdate: null, formTitle: "Ajouter une voiture", defaultValues: {
       brand: '',
       model: '',
       registration_number: '',
-      year: currentYear, // Updated
+      year: currentYear,
       color: '',
       engine: '',
       quantity: 1,
@@ -164,10 +274,9 @@ function CarsList() {
         engine: '',
         quantity: 1,
         mileage: 0,
-        resduce: 0,
         stars: 0,
         price_per_day: 0,
-        status: '',
+        status: 'disponible',
         description: ''
       }
     })
@@ -203,7 +312,6 @@ function CarsList() {
     { name: 'engine', label: 'Moteur' },
     { name: 'quantity', label: 'Quantité', type: 'number' },
     { name: 'mileage', label: 'Kilométrage', type: 'number' },
-    { name: 'resduce', label: 'Réduction', type: 'number' },
     {
       name: 'stars',
       label: 'Étoiles',
@@ -254,7 +362,6 @@ function CarsList() {
 
   const toggleUpdate = (id: any) => {
     const car = cars.filter(c => c.id === id)
-    console.log("car[0]?.status", car[0]?.status);
 
     updateState({
       isOpen: null, isOpenUppdate: true, formTitle: "Modifier la voiture", car, status: car[0]?.status, defaultValues: {
@@ -278,35 +385,36 @@ function CarsList() {
   const handelDelete = async (id: any) => {
 
     const result = await dispatch(deleteCar(id)).unwrap()
-    
-    console.log('result', result.status)
-    ;
-    
+
     if (result.status === 200) {
-      updateState({
-        typeToast: 'success',
-        contentToast: 'Voiture supprimée avec succès',
-        width: '22rem'
-      })
-      setTimeout(() => {
-        updateState({
+         // Effacer d'abord toute notification existante
+         updateState({
+          isOpenUppdate: false,
           typeToast: null,
           contentToast: null,
           width: null
-        })
-      }, 3000)
+        });
+
+        // Attendre que React termine son cycle de rendu
+        setTimeout(() => {
+          updateState({
+            typeToast: 'success',
+            contentToast: 'Voiture modifiée avec succès',
+            width: '22rem'
+          })
+        }, 100);
     }
   }
 
-    return (
-      <>
-         {state.typeToast ? (
-              <ToastNotification
-                type={state.typeToast}
-                content={state.contentToast}
-                width={state.width}
-              />
-            ) : null}
+  return (
+    <>
+      {state.typeToast ? (
+        <ToastNotification
+          type={state.typeToast}
+          content={state.contentToast}
+          width={state.width}
+        />
+      ) : null}
       <div className='gap-2 grid'>
         <Button
           onClick={openDialog}
@@ -373,7 +481,7 @@ function CarsList() {
                 </tr>
               </thead>
               <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
-                {paginatedData.map((car, index) => (
+                {paginatedData?.map((car, index) => (
                   <tr
                     key={car.id || `car-${index}`}
                     className='text-gray-700 dark:text-gray-400'
@@ -405,7 +513,7 @@ function CarsList() {
                             side='right'
                             align='center'
                           >
-                            <div className='bg-white shadow-xl mx-4 sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
+                            <div className='bg-white shadow-xl sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
                               <div className='rounded-t-lg h-44 overflow-hidden'>
                                 <img
                                   className='w-full object-cover object-top'
@@ -469,13 +577,12 @@ function CarsList() {
                     </td>
                     <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                       <span
-                        className={`bg-green-100 ${quicksand.className} ${
-                          isReserved(car.id) === 'réservés'
-                            ? 'dark:bg-green-700 bg-orange-200 text-orange-500'
-                            : isReserved(car.id) === 'Certains sont réservés' 
-                              ? 'bg-orange-100 text-orange-300' 
-                              : "dark:bg-green-600 text-green-600 dark:text-green-100"
-                        } px-2 py-1 rounded-full font-semibold leading-tight text-center whitespace-nowrap`}
+                        className={`bg-green-100 ${quicksand.className} ${isReserved(car.id) === 'réservés'
+                          ? 'dark:bg-green-700 bg-orange-200 text-orange-500'
+                          : isReserved(car.id) === 'Certains sont réservés'
+                            ? 'bg-orange-100 text-orange-300'
+                            : "dark:bg-green-600 text-green-600 dark:text-green-100"
+                          } px-2 py-1 rounded-full font-semibold leading-tight text-center whitespace-nowrap`}
                       >
                         {reservations ? (
                           <span>{isReserved(car.id)}</span>
@@ -561,7 +668,8 @@ function CarsList() {
                                   strokeLinecap='round'
                                   strokeLinejoin='round'
                                 />
-                              </svg></button>
+                              </svg>
+                            </button>
 
                           </li>
                         </ul>
@@ -652,8 +760,8 @@ function CarsList() {
           </div>
         </div>
       </div>
-      </>
-    )
-  }
+    </>
+  )
+}
 
-  export default CarsList
+export default CarsList

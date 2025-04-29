@@ -12,7 +12,7 @@ class Car extends Model
 
     protected $fillable = [
         'brand', 'model', 'registration_number', 'year', 'color',
-        'engine', 'image', 'quantity', 'mileage', 'resduce',
+        'engine', 'image', 'quantity', 'mileage',
         'stars', 'price_per_day', 'status', 'description'
     ];
 }

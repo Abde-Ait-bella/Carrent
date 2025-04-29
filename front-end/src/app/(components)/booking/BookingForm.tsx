@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { createReservation } from '@/lib/features/reservationFormSlice'
+import { createReservation } from '@/lib/features/reservationSlice'
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -12,12 +12,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { CalendarIcon, ChevronRight, ChevronLeft, Check, X } from 'lucide-react'
-import { format, addDays, differenceInDays } from 'date-fns'
+import { format, addDays, differenceInDays, set } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import ToastNotification from '../elements/ToastNotification'
-import { Poppins, Quicksand } from 'next/font/google'
-import Cookies from 'js-cookie'
+import { Poppins } from 'next/font/google'
+import { setUserData, fetchUserData } from '@/lib/features/userSlice'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 
@@ -35,6 +35,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
   onClose
 }) => {
   const dispatch = useAppDispatch()
+ 
+  useEffect(() => {
+    dispatch(fetchUserData())
+  }
+  , [ dispatch ])
+
+  const user = useAppSelector((state) => state.user)
+
   const [state, setState] = useState<any>({
     step: 1,
     totalSteps: 3,
@@ -56,16 +64,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
   })
 
-  // Get current user info from auth or global state
-  // For now, let's use a hardcoded userId
-  //   const userId = 1 // replace with actual user ID from auth
-  //   const userEmail = "user@example.com" // replace with actual user email
-  //   const userName = "John Doe" // replace with actual user name
-  //   const userPhone = "+212 600000000" // replace with actual user phone
-
-  // const userId = useAppSelector((state) => state.auth.user?.id)
-  
-
   const updateState = (newState: Partial<typeof state>) => {
     setState((prevState: any) => ({
       ...prevState,
@@ -73,6 +71,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }))
   }
 
+
+  // Update this section - remove test variable
+  // console.log('user data', user.name);
+  // const test = user.name
+  
   // Form validation schema
   const formSchema = z.object({
     // user_id: z.number().default(userId),
@@ -107,11 +110,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
     daily_rate: car?.price_per_day ? car.price_per_day.toString() : "",
     total_price: "",
     state: "pending",
-    // Default user information
+    // Default user information - remove default values here
     name: "",
     email: "",
     user_phone: "",
-
   }
 
   const form = useForm({
@@ -119,7 +121,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
     defaultValues
   })
 
-  // Update form values when car changes
+  // Add this useEffect to update form values when user data is loaded
+  useEffect(() => {
+    if (user && user.name) {
+      form.setValue('name', user.name);
+    }
+    if (user && user.email) {
+      form.setValue('email', user.email);
+    }
+  }, [user, form]);
+  
+  // Keep your existing useEffect for car data
   useEffect(() => {
     if (car && car.price_per_day) {
       form.setValue('daily_rate', car.price_per_day.toString());
@@ -133,7 +145,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     onClose();
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
     
     const currentStep = state.step;
 
@@ -146,9 +158,31 @@ const BookingForm: React.FC<BookingFormProps> = ({
         form.trigger(['rental_start', 'rental_end']);
         return;
       }
+      
+      // Calculate total price when going from step 1 to step 2
+      if (car && car.price_per_day) {
+        const days = differenceInDays(form.getValues('rental_end'), form.getValues('rental_start'));
+        const totalPrice = days * parseInt(car.price_per_day);
+        form.setValue('total_price', totalPrice.toString());
+      }
+      
     } else if (currentStep === 2) {
-      const isValid = form.trigger(['name', 'email', 'user_phone']);
-      if (!isValid) {
+      // Validation manuelle des champs à l'étape 2
+      const name = form.getValues('name');
+      const email = form.getValues('email');
+      const phone = form.getValues('user_phone');
+      
+      if (!name || !email || !phone) {
+        await form.trigger(['name', 'email', 'user_phone']);
+        return;
+      }
+      
+      // Vérifier explicitement si les champs sont valides
+      const nameField = form.getFieldState('name');
+      const emailField = form.getFieldState('email');
+      const phoneField = form.getFieldState('user_phone');
+      
+      if (nameField.invalid || emailField.invalid || phoneField.invalid) {
         return;
       }
     }
@@ -174,21 +208,23 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const onSubmit = async (data: any) => {
-    console.log('data reservation ', data);
-
     updateState({ isLoading: true });
 
     try {
 
       const result = await dispatch(createReservation(data)).unwrap();
       
-      if (result.status === 201 && result.user) {
-
-        Cookies.set('user_role', 'user', { expires: 7, secure: true })
-        Cookies.set('user_name', result.user.name, { expires: 7, secure: true })
-        Cookies.set('user_email', result.user.email, { expires: 7, secure: true })
-        Cookies.set('user_id', result.user.id, { expires: 7, secure: true })
-        Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
+      if (result.status === 201) {
+        
+        dispatch(setUserData({
+          id: result.user.id,
+          name: result.user.name,
+          email: result.user.email,
+          token: result.authorisation.token,
+          role: result.user_role,
+          remember : false,
+          autenticated: true
+        }))
 
         updateState({
           isLoading: false,
@@ -300,7 +336,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 <div className="grid gap-4">
                   {/* Car details - visible on all steps */}
                   {car && (
-                    <div className="p-4 bg-gray-50 rounded-md">
+                    <div className="p-4 bg-gray-200 rounded-md">
                       <div className="flex space-x-4 items-center">
                         {car.image && (
                           <img
@@ -418,7 +454,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                         name="daily_rate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Tarif journalier (MAD)</FormLabel>
+                            <FormLabel>Prix par Jour (MAD)</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -517,48 +553,28 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
                         <div className="pt-2 border-t">
                           <div className="flex justify-between">
-                            <span className="font-medium">Tarif journalier:</span>
+                            <span className="font-medium">Prix par Jour:</span>
                             <span>{form.getValues('daily_rate')} MAD</span>
                           </div>
 
-                          {Object.entries(state.additionalOptions).map(([key, selected]) => {
-                            if (!selected) return null;
-                            const optionName = {
-                              insurance: "Assurance tous risques",
-                              gps: "GPS Navigation",
-                              childSeat: "Siège enfant",
-                              additionalDriver: "Conducteur additionnel"
-                            }[key];
-                            return (
-                              <div key={key} className="flex justify-between">
-                                <span>{optionName}:</span>
-                                <span>{state.optionPrices[key]} MAD</span>
-                              </div>
-                            );
-                          })}
-
+                          {/* Afficher le prix total statiquement pour éviter le recalcul */}
                           <div className="flex justify-between mt-3 pt-2 border-t font-semibold">
                             <span>TOTAL:</span>
-                            <span>{form.getValues('total_price')} MAD</span>
+                            <span>
+                              {(() => {
+                                const totalPrice = form.getValues('total_price');
+                                if (totalPrice) return `${totalPrice} MAD`;
+                                
+                                const days = differenceInDays(form.getValues('rental_end'), form.getValues('rental_start'));
+                                const calculatedPrice = days * parseInt(form.getValues('daily_rate') || '0');
+                                return `${calculatedPrice} MAD`;
+                              })()}
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Terms and conditions */}
-                      {/* <div className="flex items-start space-x-2">
-                        <input
-                          type="checkbox"
-                          id="terms"
-                          checked={state.termsAccepted}
-                          onChange={() => updateState({ termsAccepted: !state.termsAccepted })}
-                          className="mt-1"
-                        />
-                        <label htmlFor="terms" className="text-sm">
-                          J'accepte les <span className="text-blue-600">termes et conditions</span> et la <span className="text-blue-600">politique de confidentialité</span>
-                        </label>
-                      </div> */}
-
-                      {/* Final Price */}
+                      {/* Final Price - gardé caché mais avec preventDefault pour éviter les soumissions automatiques */}
                       <FormField
                         control={form.control}
                         name="total_price"
@@ -569,6 +585,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                                 type="text"
                                 readOnly
                                 {...field}
+                                onSubmit={(e) => e.preventDefault()}
                               />
                             </FormControl>
                           </FormItem>
@@ -607,7 +624,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     </Button>
                   ) : (
                     <Button
-                      type="submit"
+                      type="button" // Changé de submit à button
+                      onClick={(e) => {
+                        e.preventDefault(); // Empêcher la soumission automatique
+                        form.handleSubmit(onSubmit)(e); // Appeler manuellement la soumission du formulaire
+                      }}
                       className="bg-green-600 hover:bg-green-700 text-white"
                       disabled={state.isLoading}
                     >

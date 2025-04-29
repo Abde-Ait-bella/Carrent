@@ -1,20 +1,23 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Poppins } from 'next/font/google'
-import useReservationStore from '@/app/store/storeFetch'
+import { fetchReservations } from '@/lib/features/reservationSlice'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import * as Tooltip from '@radix-ui/react-tooltip'
-// import cancledSVG from '../../asset²s/img/pending.svg'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 
 function page () {
-  const { reservations, fetchReservations } = useReservationStore()
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    fetchReservations()
+    dispatch(fetchReservations())
   }, [])
+
+  const reservations = useAppSelector(state => state.reservation.reservations)
 
   // Make sure we only work with reservations that have valid user objects
   const filteredReservations = reservations.filter(reser => reser && reser.user)
@@ -123,7 +126,7 @@ function page () {
                             side='right'
                             align='center'
                           >
-                            <div class='bg-white shadow-xl mx-4 sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
+                            <div class='bg-white shadow-xl sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
                               <div class='rounded-t-lg h-32 overflow-hidden'>
                                 <img
                                   class='w-full object-cover object-top'

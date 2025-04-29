@@ -24,6 +24,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
   handleOpen ,
 }) => {
 
+
   const dispatch = useAppDispatch();
   const form = useForm();
 
@@ -38,6 +39,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
     contentToast: null,
 
   })
+
 
   const [valueStatus, setValueStatus] = useState()
 
@@ -365,7 +367,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
                                   Change Status
                                 </button>
                                 <button onClick={() => toggleUpdateStatus(d.id)} className={`block ${poppins.className} text-[.8rem] bg-[#3A5A75] hover:shadow-lg mx-auto px-2 py-2 rounded-full w-1/2 text-white`}>
-                                  Chanege Paiment
+                                  Change Payment
                                 </button>
                               </div>
                             </div>

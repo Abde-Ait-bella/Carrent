@@ -5,9 +5,11 @@ import { swiperGroup3 } from '@/util/swiperOptions'
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { fetchCars } from '@/lib/features/carsSlice'
-import { openReservationForm } from '@/lib/features/reservationFormSlice'
+import { openreservation } from '@/lib/features/reservationSlice'
 import { Car } from '@/lib/features/carsSlice'
 import BookingPage from "../booking/page";
+import { faCarSide } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function CarsListing1() {
 	const dispatch = useAppDispatch();
@@ -30,8 +32,8 @@ export default function CarsListing1() {
 	const carGroups = cars && cars.length > 0 ? groupCarsInPairs(cars) : [];
 
 	// Function to handle booking button click
-	const handleBookNow = (carId: number) => {
-		dispatch(openReservationForm(carId));
+	const  handleBookNow = (carId: number) => {
+		dispatch(openreservation(carId));
 	};
 
 	return (
@@ -71,7 +73,7 @@ export default function CarsListing1() {
 												{group.map((car: Car) => (
 													<div key={car.id} className="card-journey-small background-card hover-up">
 														<div className="card-image">
-															<Link href={`/cars-details-1?id=${car.id}`}>
+															<Link href={`/cars-details/${car.id}`} className="image-hover-1">
 																<img 
 																	className="!h-[13rem] w-full object-cover"
 																	src={car.image ? `http://127.0.0.1:8000/storage/${car.image}` : "/assets/imgs/cars-listing/cars-listing-1/car-1.png"} 
@@ -87,7 +89,7 @@ export default function CarsListing1() {
 																</div>
 															</div>
 															<div className="card-title">
-																<Link className="heading-6 neutral-1000" href={`/cars-details-1?id=${car.id}`}>
+																<Link className="heading-6 neutral-1000" href={`/cars-details/${car.id}`}>
 																	{car.brand} {car.model}
 																</Link>
 															</div>
@@ -101,7 +103,9 @@ export default function CarsListing1() {
 																	<p className="text-md-medium card-miles">{car.mileage} km</p>
 																	<p className="text-md-medium card-gear">{car.engine || 'Automatic'}</p>
 																	<p className="text-md-medium card-fuel">{car.year}</p>
-																	<p className="text-md-medium card-seat">{car.quantity} available</p>
+																	<p className="text-md-medium">
+																		<FontAwesomeIcon icon={faCarSide} className="me-2" />
+																		{car.quantity} available</p>
 																</div>
 																<div className="endtime">
 																	<div className="card-price">

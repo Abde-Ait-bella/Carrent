@@ -4,7 +4,6 @@ import carsSlice from './features/carsSlice'
 import reservationSlice from './features/reservationSlice'
 import paimentSlice from './features/paimentSlice'
 import citiesSlice from './features/citiesSlice'
-import reservationFormSlice from './features/reservationFormSlice'
 import userSlice from './features/userSlice'
 
 export const makeStore = () => {
@@ -12,17 +11,14 @@ export const makeStore = () => {
     reducer: {
         counter: counterReducer, 
         cars: carsSlice,
-        reservation: reservationSlice,
+        reservation: reservationSlice,  // Ce reducer contient maintenant tout
         paiment: paimentSlice,
         cities : citiesSlice,
-        reservationForm: reservationFormSlice,
         user: userSlice
     },
   })
 }
 
-// Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<AppStore['getState']>
 export type AppDispatch = AppStore['dispatch']

@@ -5,16 +5,20 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CarRequest;
 use App\Models\Car;
 use App\Http\Controllers\Controller;
+use App\Services\CarService;
 use Illuminate\Http\Request;
-use Storage;
 
 class CarController extends Controller
 {
+    protected $carService;
 
+    public function __construct(CarService $carService)
+    {
+        $this->carService = $carService;
+    }
 
     /**
-    
-* @OA\POST(
+    * @OA\POST(
     * path="/api/cars",
     * summary="Retrieve all available cars",
     * description="Returns a list of all cars available in the system, including details such as brand, model, year, color, engine type, mileage, rental price per day, and availability status.",
@@ -35,16 +39,15 @@ class CarController extends Controller
     * @OA\Property(property="price_per_day", type="number", format="float", example=53.43),
     * @OA\Property(property="status", type="string", example="available"),
     * @OA\Property(property="description", type="string", example="Non non voluptatibus numquam quaerat."),
-*)),
-* security={{"bearerAuth":{}}},
-* tags={"Cars"},
-* @OA\Response(response="200", description="Cars data"),
-* @OA\Response(response="403", description="Unauthenticated"),)
-*/
-
+    *)),
+    * security={{"bearerAuth":{}}},
+    * tags={"Cars"},
+    * @OA\Response(response="200", description="Cars data"),
+    * @OA\Response(response="403", description="Unauthenticated"),)
+    */
     public function index()
     {
-        $cars = Car::all();
+        $cars = $this->carService->getAllCars();
         return response()->json($cars);
     }
 
@@ -54,23 +57,36 @@ class CarController extends Controller
     public function store(CarRequest $request)
     {
         $validated = $request->validated();
+        $image = $request->hasFile('image') ? $request->file('image') : null;
+        
+        $car = $this->carService->createCar($validated, $image);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('cars', 'public');
-        }
-
-        $car = Car::create($validated);
-
-        return response()->json($car, 201);
+        return response()->json([$car, 'status'=>201], 201);
     }
 
     /**
      * Display the specified resource.
+     * 
+     * @OA\Get(
+     *     path="/api/cars/{id}",
+     *     summary="Get car by ID",
+     *     description="Returns a specific car's details based on the provided ID",
+     *     tags={"Cars"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the car to retrieve",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response="200", description="Car data retrieved successfully"),
+     *     @OA\Response(response="404", description="Car not found"),
+     * )
      */
     public function show(Car $car)
     {
-        //
-    }			
+        return response()->json(['data' => $car, 'status' => 200], 200);
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -84,19 +100,13 @@ class CarController extends Controller
      * Update the specified resource in storage.
      */
     public function update(CarRequest $request, Car $car)
-    {	
+    {
         $validated = $request->validated();
-
-        if ($request->hasFile('image')) {
-            if ($car->image) {
-                Storage::disk('public')->delete($car->image);
-            }
-			$validated['image'] = $request->file('image')->store('cars', 'public');
-			
-        }
+        $image = $request->hasFile('image') ? $request->file('image') : null;
         
-        $car->update($validated); 
-        return response()->json($car);
+        $updatedCar = $this->carService->updateCar($car, $validated, $image);
+
+        return response()->json([$updatedCar, 'status' => 200], 200);
     }
 
     /**
@@ -104,11 +114,7 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        if ($car->image) {
-            Storage::disk('public')->delete($car->image);
-        }
-
-        $car->delete();
+        $this->carService->deleteCar($car);
         return response()->json(['message' => 'Car deleted successfully', 'status' => 200]);
     }
 }

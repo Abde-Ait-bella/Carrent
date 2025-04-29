@@ -144,8 +144,8 @@ const GeneratedForm: React.FC<FormProps> = ({
     final_price: reservation?.final_price ? reservation.final_price.toString() : '',
     comprehensive_insurance: false,
     duration: {
-      from: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
-      to: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
+      // from: reservation?.rental_start ? new Date(reservation.rental_start) : undefined,
+      // to: reservation?.rental_end ? new Date(reservation.rental_end) : undefined
     }
   }
 
@@ -280,8 +280,6 @@ const GeneratedForm: React.FC<FormProps> = ({
 
     setGeneratedPDF(doc);
   };
-
-  console.log("reservation :", reservation?.contract_url);
   
 
   const downloadPDF = () => {
@@ -295,7 +293,7 @@ const GeneratedForm: React.FC<FormProps> = ({
   }
 
   const onSubmit = async (formData: Record<string, any>) => {
-    // Activer l'état de chargement au début de la soumission
+    
     updateState({ isLoading: true });
 
     const dataWithReservationId = {
@@ -331,13 +329,6 @@ const GeneratedForm: React.FC<FormProps> = ({
             
 
             if (result && result.status === 201) {
-              
-              console.log(reservation.contract_url, result.file_path, `/contracts/contract_${reservation.id}.pdf`);
-              
-              // reservation.contract_url = result.file_path ?
-              //   `/storage/${result.file_path}` :
-              //   `/contracts/contract_${reservation.id}.pdf`;
-
               // Mettre à jour l'état local et global
               updateState({
                 typeToast: 'success',
@@ -351,7 +342,6 @@ const GeneratedForm: React.FC<FormProps> = ({
                 emptyToast();
               }, 3000);
               reset();
-
               // Recharger les réservations pour mettre à jour l'UI avec le nouveau contrat
               dispatch(fetchReservations());
             }
@@ -442,20 +432,20 @@ const GeneratedForm: React.FC<FormProps> = ({
     ]
   }
 
-  useEffect(() => {
-    if (form.watch('duration')?.from && form.watch('duration')?.to && form.watch('daily_rate')) {
-      const startDate = new Date(form.watch('duration').from);
-      const endDate = new Date(form.watch('duration').to);
-      const diffTime = Math.abs(endDate - startDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // useEffect(() => {
+  //   if (form.watch('duration')?.from && form.watch('duration')?.to && form.watch('daily_rate')) {
+  //     const startDate = new Date(form.watch('duration').from);
+  //     const endDate = new Date(form.watch('duration').to);
+  //     const diffTime = Math.abs(endDate - startDate);
+  //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      const dailyRate = parseFloat(form.watch('daily_rate'));
-      if (!isNaN(dailyRate)) {
-        const finalPrice = (diffDays * dailyRate).toString();
-        form.setValue('final_price', finalPrice);
-      }
-    }
-  }, [form.watch('duration'), form.watch('daily_rate')]);
+  //     const dailyRate = parseFloat(form.watch('daily_rate'));
+  //     if (!isNaN(dailyRate)) {
+  //       const finalPrice = (diffDays * dailyRate).toString();
+  //       form.setValue('final_price', finalPrice);
+  //     }
+  //   }
+  // }, [form.watch('duration'), form.watch('daily_rate')]);
 
   const [date, setDate] = React.useState<DateRange | undefined>();
 
@@ -571,7 +561,8 @@ const GeneratedForm: React.FC<FormProps> = ({
                                       onClick={() => updateState({ typeToast: '' })}
                                     >
                                       <CalendarIcon className="mr-2 h-4 w-4 text-[#6083B7]" />
-                                      {date?.from ? (
+                                      {
+                                      date?.from ? (
                                         date.to ? (
                                           <>
                                             {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
@@ -579,7 +570,9 @@ const GeneratedForm: React.FC<FormProps> = ({
                                         ) : (
                                           format(date.from, "LLL dd, y")
                                         )
-                                      ) : field?.value?.from ? (
+                                      ) 
+                                      : 
+                                      field?.value?.from ? (
                                         field.value.to ? (
                                           <>
                                             {format(field.value.from, "LLL dd, y")} - {format(field.value.to, "LLL dd, y")}
@@ -596,10 +589,10 @@ const GeneratedForm: React.FC<FormProps> = ({
                                     <Calendar
                                       initialFocus
                                       mode="range"
-                                      defaultMonth={field?.rental_start || new Date()}
+                                      defaultMonth={field?.rental_start}
                                       selected={{
-                                        from: controlledField.value?.from || field?.rental_start,
-                                        to: controlledField.value?.to || field?.final_return
+                                        from: controlledField.value?.from ,
+                                        to: controlledField.value?.to 
                                       }}
                                       onSelect={(range) => {
                                         controlledField.onChange(range);
