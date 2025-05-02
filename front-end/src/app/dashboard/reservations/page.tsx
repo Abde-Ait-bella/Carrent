@@ -11,16 +11,17 @@ function Reservations() {
     })
 
     const updateState = (newState: Partial<typeof state>) => {
+        console.log('newState', newState);
         setState((prevState) => ({
             ...prevState,
             ...newState
         }))
     }
 
-    const openMultipForm = (res: any) => {
-        updateState({ isOpen: true, reservation: res } )
-        console.log('reservation', res);
-    }
+    // const openMultipForm = (res: any) => {
+    //     updateState({ isOpen: true, reservation: res } )
+    //     console.log('reservation', res);
+    // }
 
     const closeMultiForm = () => {
         updateState({ isOpen: false } )
@@ -28,7 +29,7 @@ function Reservations() {
 
     return (
         <>
-            <ReservationList handleOpen={openMultipForm} />
+            <ReservationList updateStateParent={updateState} />
             <GeneratedForm isOpen={state.isOpen} reservation={state.reservation} onClose={closeMultiForm}  />
         </>)
 }

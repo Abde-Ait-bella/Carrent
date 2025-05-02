@@ -59,8 +59,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 interface FormProps {
   isOpen: boolean,
-  reservation: any
-  onClose?: any,
+  reservation: any,
+  onClose?: () => void,
+  contractUrl?: string | undefined
 }
 
 interface DateRange {
@@ -71,7 +72,8 @@ interface DateRange {
 const GeneratedForm: React.FC<FormProps> = ({
   isOpen,
   reservation,
-  onClose
+  onClose,
+  contractUrl
 }) => {
 
   const dispatch = useAppDispatch()
@@ -81,7 +83,17 @@ const GeneratedForm: React.FC<FormProps> = ({
     typeToast: null,
     selectedFile: null,
     isLoading: false, // Ajout de l'état de chargement
+    showExistingContract: false // Pour afficher un contrat existant
   })
+
+  // Effet pour détecter si un contrat existant est passé
+  useEffect(() => {
+    if (contractUrl && contractUrl.trim() !== '') {
+      updateState({ showExistingContract: true });
+    } else {
+      updateState({ showExistingContract: false });
+    }
+  }, [contractUrl]);
 
   const [generatedPDF, setGeneratedPDF] = useState<jsPDF | null>(null);
 
@@ -533,7 +545,55 @@ const GeneratedForm: React.FC<FormProps> = ({
             </div>
 
             <div className="p-6">
-              {state.step === 0 && (
+              {state.showExistingContract && contractUrl ? (
+                <div className="flex flex-col items-center justify-center space-y-6">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 w-full max-w-xl">
+                    <div className="flex items-center mb-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-800">Contrat de Location</h3>
+                        <p className="text-sm text-gray-600">
+                          Réservation #{reservation?.id} - {reservation?.user?.name || "Client"}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 mb-4">
+                      Ce contrat a déjà été généré et signé. Vous pouvez le consulter en cliquant sur le bouton ci-dessous.
+                    </p>
+                    <div className="flex justify-center">
+                      <Button 
+                        onClick={() => {
+                          // Si l'URL est relative, la préfixer avec l'URL de base de l'API
+                          let url = contractUrl;
+                          if (url && url.startsWith('/')) {
+                            const baseUrl = process.env.NEXT_PUBLIC_API_URL_SAP || '';
+                            url = `${baseUrl}${url}`;
+                          }
+                          window.open(url, '_blank');
+                        }}
+                        className="bg-[#6083B7] hover:bg-[#1F4068] text-white transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Voir le contrat
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => onClose()}
+                    className="bg-gray-500 hover:bg-gray-600 text-white transition-colors"
+                  >
+                    Fermer
+                  </Button>
+                </div>
+              ) : state.step === 0 && (
                 <Form {...form}>
                   <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-6">
                     <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">

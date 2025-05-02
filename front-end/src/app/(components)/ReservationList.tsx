@@ -18,11 +18,16 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
 interface ReservationListProps {
-  handleOpen?: any
+  updateStateParent?: any
 }
 const ReservationList : React.FC<ReservationListProps> = ({
-  handleOpen ,
+  updateStateParent ,
 }) => {
+
+  const handleClick = (data:any) =>{
+    console.log('data', data);
+    updateStateParent({ isOpen: true, reservation: data })
+  }
 
 
   const dispatch = useAppDispatch();
@@ -432,7 +437,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => handleOpen(d)}
+                        onClick={() => handleClick(d)}
                         variant='outline'
                         className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
                       >
