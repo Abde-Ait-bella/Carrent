@@ -75,30 +75,30 @@ export interface Car {
   price_per_day: number;
   status: string;
   description: string;
-  currentCar: Car | null; // Ajout de currentCar ici
-  loading: boolean; // Ajout de loading ici
-  error: string | null; // Ajout de error ici
+  currentCar: Car | null; 
+  loading: boolean;
+  error: string ;
 }
 
 
 interface CarsState {
   cars: Car[]
-  error: string | null
-  currentCar: Car | null; // Ajout de currentCar ici
-  loading: boolean; // Ajout de loading ici
+  error: string 
+  currentCar: Car | null;
+  loading: boolean;
 }
 
 const initialState: CarsState = {
   cars: [],
-  error: null,
-  currentCar: null, // Initialisation de currentCar
-  loading: false, // Initialisation de loading
+  error: '',
+  currentCar: null, 
+  loading: false, 
 }
 
 const carsSlice = createSlice({
   name: 'cars',
   initialState,
-  reducers: {}, // Pas d'actions synchrones ici
+  reducers: {}, 
   extraReducers: builder => {
     builder
       .addCase(fetchCars.fulfilled, (state, action) => {
@@ -106,25 +106,22 @@ const carsSlice = createSlice({
       })
 
       .addCase(addCar.fulfilled, (state, action) => {
-        state.cars.push(action.payload) // Ajouter la nouvelle voiture à l'état
+        state.cars.push(action.payload) 
       })
 
       .addCase(updateCar.fulfilled, (state, action) => {
-        // Vérifier si action.payload existe et contient les données attendues
         if (action.payload && action.payload.id) {
           const index = state.cars.findIndex(car => car.id === action.payload.id)
-          // S'assurer que l'index est valide avant de mettre à jour
           if (index !== -1) {
             state.cars[index] = action.payload
           } else {
-            // Si la voiture n'existe pas déjà, l'ajouter
             state.cars.push(action.payload)
           }
         }
       })
 
       .addCase(deleteCar.fulfilled, (state, action) => {
-        state.cars = state.cars.filter(car => car.id !== action.meta.arg) // Supprimer la voiture par ID
+        state.cars = state.cars.filter(car => car.id !== action.meta.arg) 
       })
 
       .addCase(fetchCarById.fulfilled, (state, action) => {
@@ -141,5 +138,4 @@ const carsSlice = createSlice({
   }
 })
 
-// 🔹 Exporter le reducer pour l'intégrer au store
 export default carsSlice.reducer

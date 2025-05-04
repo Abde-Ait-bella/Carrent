@@ -2,6 +2,8 @@
 import ReservationList from '@/app/(components)/ReservationList'
 import DashboardLayout from '../(components)/layouts/DashboardLayout'
 import Statistical from './statistical/page'
+import AdvancedStats from './advanced-stats/AdvancedStats'
+
 
 function Dashboard () {
 
@@ -11,6 +13,8 @@ function Dashboard () {
       {/* <!-- Cards --> */}
       <Statistical/>
 
+      <AdvancedStats />
+      
       {/* <!-- reservations --> */}
       <ReservationList />
 

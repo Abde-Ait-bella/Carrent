@@ -43,7 +43,6 @@ export const createReservation = createAsyncThunk(
   }
 )
 
-// Actions de reservationSlice
 export const fetchReservations = createAsyncThunk(
   'reservation/fetchreservation',
   async () => {
@@ -51,12 +50,10 @@ export const fetchReservations = createAsyncThunk(
       const response = await api.get('/reservations');
       let reservations = response.data;
       
-      // Récupérer les confirmations de réservation (contrats)
       try {
         const contractsResponse = await api.get('/reservation-confirmations');
         const confirmations = contractsResponse.data || [];
         
-        // Associer chaque confirmation à sa réservation correspondante
         reservations = reservations.map((reservation: Reservation) => {
           const confirmation = confirmations.find((c: any) => c.reservation_id === reservation.id);
           
@@ -68,8 +65,7 @@ export const fetchReservations = createAsyncThunk(
           };
         });
       } catch (e) {
-        // Si l'API de confirmations échoue, continuer avec les données de base
-      }
+        console.error("Erreur lors de la récupération des confirmations de réservation:", e);}
       
       return reservations;
     } catch (error) {

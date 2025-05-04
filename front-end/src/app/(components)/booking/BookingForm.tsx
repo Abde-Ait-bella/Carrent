@@ -143,9 +143,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   }
 
   const nextStep = async () => {
-    
-    const currentStep = state.step;
 
+    const currentStep = state.step;
     // Validate current step fields before proceeding
     if (currentStep === 1) {
       const start = form.getValues('rental_start');
@@ -161,12 +160,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
         const totalPrice = days * parseInt(car.price_per_day);
         form.setValue('total_price', totalPrice.toString());
       }
-      
+      if (currentStep < state.totalSteps) {
+        updateState({ step: currentStep + 1 });
+      }
     } else if (currentStep === 2) {
       // Validation manuelle des champs à l'étape 2
       const name = form.getValues('name');
       const email = form.getValues('email');
       const phone = form.getValues('user_phone');
+      console.log('Current Step:');
       
       if (!name || !email || !phone) {
         await form.trigger(['name', 'email', 'user_phone']);
@@ -197,23 +199,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
       updateState({ step: state.step - 1 });
     }
   }
-
-  const toggleAdditionalOption = (option: string) => {
-    updateState({
-      additionalOptions: {
-        ...state.additionalOptions,
-        [option]: !state.additionalOptions[option]
-      }
-    });
-  }
-
+  
   const onSubmit = async (data: any) => {
     updateState({ isLoading: true });
 
     try {
 
       const result = await dispatch(createReservation(data)).unwrap();
-      
+      console.log('Reservation result:', result);
       if (result.status === 201) {
         
         dispatch(setUserData({

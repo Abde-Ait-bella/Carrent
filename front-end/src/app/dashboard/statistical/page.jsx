@@ -36,7 +36,7 @@ function Statistical () {
       <div className='gap-6 grid md:grid-cols-3 xl:grid-cols-3 mb-8'>
         {/* <!-- Card --> */}
         <Link href='/dashboard/clients'>
-          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 hover:text-white dark:text-gray-400 cursor-pointer'>
+          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 dark:text-gray-400 cursor-pointer'>
             <div className='bg-orange-100 dark:bg-orange-500 mr-4 p-3 rounded-full text-orange-500 dark:text-orange-100'>
               {/* Utiliser un SVG statique avec des attributs fixes */}
               <svg 
@@ -69,7 +69,7 @@ function Statistical () {
         </Link>
         {/* <!-- Card --> */}
         <Link href='/dashboard/available-cars'>
-          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 hover:text-white dark:text-gray-400 cursor-pointer'>
+          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 dark:text-gray-400 cursor-pointer'>
             <div className='bg-green-100 dark:bg-green-500 mr-4 p-3 rounded-full text-green-500 dark:text-green-100'>
               {/* Utiliser un SVG statique avec des attributs fixes */}
               <svg 
@@ -102,7 +102,7 @@ function Statistical () {
         </Link>
         {/* <!-- Card --> */}
         <Link href='/dashboard/active-reservations'>
-          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 hover:text-white dark:text-gray-400 cursor-pointer'>
+          <div className='flex items-center bg-white hover:bg-[#6083B7] dark:bg-gray-800 shadow-md p-4 rounded-lg text-gray-600 dark:text-gray-400 cursor-pointer'>
             <div className='bg-teal-100 dark:bg-teal-500 mr-4 p-3 rounded-full text-teal-500 dark:text-teal-100'>
               {/* Utiliser un SVG statique avec des attributs fixes */}
               <svg 

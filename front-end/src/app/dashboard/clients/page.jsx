@@ -113,7 +113,7 @@ function page () {
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
                           <div>
-                            <button class={`group ${poppins.className} group group-hover:from-[#1F4068] group-hover:to-[#6083B7] inline-flex relative justify-center items-center bg-gradient-to-br from-[#2C5A96] to-[#6083B7] mr-2 p-0.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-200 dark:focus:ring-[#0E2540] font-medium text-gray-900 hover:text-white dark:text-white text-sm`}>
+                            <button class={`group ${poppins.className} group group-hover:from-[#1F4068] group-hover:to-[#6083B7] inline-flex relative justify-center items-center bg-gradient-to-br from-[#2C5A96] to-[#6083B7] mr-2 p-0.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-200 dark:focus:ring-[#0E2540] font-medium text-gray-900  dark:text-white text-sm`}>
                               <span class={`relative ${poppins.className} bg-white dark:bg-[#0E2540] group-hover:bg-opacity-0 px-5 py-1.5 rounded-md transition-all duration-75 ease-in`}>
                               Detailles
                               </span>
@@ -245,7 +245,7 @@ function page () {
                       currentPage == 1
                         ? 'bg-gray-300'
                         : 'bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-900'
-                    } flex justify-center items-center   dark:bg-gray-800 ml-2 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                    } flex justify-center items-center   dark:bg-gray-800 ml-2 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                   >
                     <svg
                       className='me-2 w-3.5 h-3.5 rtl:rotate-180'
@@ -272,7 +272,7 @@ function page () {
                         onClick={() => setCurrentPage(index + 1)}
                         className={`flex justify-center items-center ${
                           currentPage == index + 1 ? 'bg-gray-700' : 'bg-gray-400'
-                        }  dark:hover:bg-gray-600 dark:bg-gray-800 px-4 border-0  dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                        }  dark:hover:bg-gray-600 dark:bg-gray-800 px-4 border-0  dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                       >
                         {index + 1}{' '}
                       </button>
@@ -287,7 +287,7 @@ function page () {
                       currentPage == totalPages
                         ? 'bg-gray-300'
                         : 'bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-900'
-                    } flex justify-center items-center  dark:bg-gray-800 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                    } flex justify-center items-center  dark:bg-gray-800 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                   >
                     Next
                     <svg
