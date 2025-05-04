@@ -4,57 +4,70 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReservationRequest;
 use App\Models\Reservation;
-use App\Http\Controllers\Controller;
+use App\Services\Interfaces\ReservationServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
+    protected $reservationService;
+
+    public function __construct(ReservationServiceInterface $reservationService)
+    {
+        $this->reservationService = $reservationService;
+    }
+
+    /**
+     * Get reservations for the current authenticated user
+     */
+    public function getUserReservations()
+    {
+        $this->authorize('viewOwn', Reservation::class);
+        $reservations = $this->reservationService->getUserReservations();
+        return response()->json($reservations);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reservations = Reservation::with(['user', 'car'])->get();
+        $this->authorize('viewAny', Reservation::class);
+        $reservations = $this->reservationService->getAllReservations();
         return response()->json($reservations);
     }
 
-    /** 
-     * Show the form for creating a new resource.
-     */
-    public function upadatetState(Reservation $reservation, Request $request)
-    {
-        
-        $reservation->state = $request->state;
-        $reservation->save();
-        return response()->json($request->state, 200);
-        // return response()->json($reservation->load(['user', 'car']), 200);
-        
-    }
-    
     /**
      * Store a newly created resource in storage.
      */
     public function store(ReservationRequest $request)
     {
-        $validated = $request->validated();
-        $reservation = Reservation::create($validated);
-        return response()->json($reservation, 201);
+        $result = $this->reservationService->storeReservation($request);
+        
+        if (isset($result['code']) && $result['code'] === 403) {
+            return response()->json([
+                'status' => $result['status'],
+                'message' => $result['message']
+            ], 403);
+        }
+        
+        return response()->json([
+            'reservation' => $result['reservation'],
+            'status' => $result['status'],
+            'user' => $result['user'],
+            'authorisation' => $result['authorisation']
+        ], 201);
     }
+    
 
     /**
      * Display the specified resource.
      */
     public function show(Reservation $reservation)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Reservation $reservation)
-    {
-        //
+        $this->authorize('view', $reservation);
+        $reservation = $this->reservationService->showReservation($reservation);
+        return response()->json($reservation);
     }
 
     /**
@@ -62,9 +75,9 @@ class ReservationController extends Controller
      */
     public function update(ReservationRequest $request, Reservation $reservation)
     {
-        $validated = $request->validated();
-        $reservation->update($validated);
-        return response()->json($reservation, 204);
+        $this->authorize('update', $reservation);
+        $updatedReservation = $this->reservationService->updateReservation($request, $reservation);
+        return response()->json($updatedReservation);
     }
 
     /**
@@ -72,7 +85,8 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        $reservation->delete();
-        return response()->json(['message' => 'Reservation deleted successfully']);
+        $this->authorize('delete', $reservation);
+        $this->reservationService->deleteReservation($reservation);
+        return response()->json(['message' => 'Réservation supprimée avec succès'], 200);
     }
 }

@@ -7,10 +7,13 @@ import Button from '@/app/(components)/elements/Button'
 import ToastNotification from '../(components)/elements/ToastNotification'
 import Cookies from 'js-cookie'
 import { useRouter } from "next/navigation"
+import { useDispatch } from 'react-redux'
+import { setUserData } from '@/lib/features/userSlice'
 
 export default function Login () {
 
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const [state, setState] = useState<{
     values: any
@@ -65,22 +68,22 @@ export default function Login () {
             contentToast: 'Connexion réussie !',
             width: '22rem'
           })
-          Cookies.set('user_role', data.user_role, { expires: 7, secure: true })
-          // Cookies.set('AUTHENTICATED', String(true), { expires: 7, secure: true })
-          if (state.values.remember) {
-            localStorage.setItem('token', data.authorisation.token)
-            localStorage.setItem('role', data.user_role)
-          } else {
-            console.log('data', data);
-            sessionStorage.setItem('token', data.authorisation.token)
-            sessionStorage.setItem('role', data)
-          }
+
+            dispatch(setUserData({
+              id: data.user.id,
+              name: data.user.name,
+              email: data.user.email,
+              token: data.authorisation.token,
+              role: data.user_role,
+              remember : state.values.remember,
+              autenticated: true
+            }))
+          
           if(data.user_role === 'admin') {
-          window.location.href = '/dashboard'
-          }else {
+            window.location.href = '/dashboard'
+          } else {
             window.location.href = '/'
           }
-          router.push('/dashboard');
         }
       })
       .catch(({ response }) => {

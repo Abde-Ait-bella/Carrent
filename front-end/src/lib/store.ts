@@ -1,24 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit'
-import counterReducer from './features/counterSlice'
 import carsSlice from './features/carsSlice'
 import reservationSlice from './features/reservationSlice'
 import paimentSlice from './features/paimentSlice'
 import citiesSlice from './features/citiesSlice'
+import userSlice from './features/userSlice'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-        counter: counterReducer, 
         cars: carsSlice,
-        reservation: reservationSlice,
+        reservation: reservationSlice, 
         paiment: paimentSlice,
-        cities : citiesSlice
+        cities : citiesSlice,
+        user: userSlice
     },
   })
 }
 
-// Infer the type of makeStore
-export type AppStore = ReturnType<typeof makeStore>
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore['getState']>
-export type AppDispatch = AppStore['dispatch']
+  export type AppStore = ReturnType<typeof makeStore>
+  export type RootState = ReturnType<AppStore['getState']>
+  export type AppDispatch = AppStore['dispatch']

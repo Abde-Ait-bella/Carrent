@@ -31,7 +31,8 @@ class ReservationFactory extends Factory
             'rental_start' => $rentalStart,
             'rental_end' => $rentalEnd,
             'daily_rate' => $dailyRate,
-            'final_price' => $finalPrice,
+            'total_price' => $finalPrice,
+            'user_phone' => $this->faker->phoneNumber(),
             'state' => $this->faker->randomElement(['pending', 'confirmed', 'canceled', 'completed']),
         ];
     }

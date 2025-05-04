@@ -15,10 +15,9 @@ use App\Http\Controllers\CityController;
 
 Route::apiResource('/cars', controller: CarController::class)->middleware('auth.api');
 Route::get('/cars', [CarController::class, 'index']);
+Route::get('/cars/{car}', [CarController::class, 'show']);
 Route::post('/cars/{car}', [CarController::class, 'update'])->middleware('auth.api');
 
-Route::apiResource('/reservations', ReservationController::class)->middleware('auth.api');
-Route::put('/reservations/{reservation}', [ReservationController::class, "upadatetState"])->middleware('auth.api');
 
 Route::apiResource('/payments', PaymentController::class)->middleware('auth.api');
 
@@ -36,3 +35,13 @@ Route::post('uploadContract', [ReservationConfirmationController::class, 'upload
 
 // Nouvel endpoint pour récupérer toutes les confirmations de réservation
 Route::get('/reservation-confirmations', [ReservationConfirmationController::class, 'getAll'])->middleware('auth.api');
+
+// Ajouter cette route avec les autres routes protégées
+Route::middleware('auth:api')->group(function () {
+    
+    Route::put('/reservations/{reservation}', [ReservationController::class, "upadatetState"]);
+    Route::apiResource('/reservations', ReservationController::class);
+    Route::get('/user-reservations', [ReservationController::class, 'getUserReservations']);
+    
+});
+Route::post('/reservations', [ReservationController::class, 'Store']);

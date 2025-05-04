@@ -2,18 +2,11 @@
 
 namespace App\Http\Controllers;
 
-/**
- * @OA\Info(
- *       title="Carrent API",
- *     version="1.0.0",
- *     description="API for managing a car rental platform, allowing users to browse available cars, check details, and make reservations.",
- *     @OA\Contact(
- *         email="abdessamadaitbella1998@gmail.com"
- *     )
- * )
- */
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
 
-abstract class Controller
+class Controller extends BaseController
 {
-    //
+    use AuthorizesRequests, ValidatesRequests;
 }

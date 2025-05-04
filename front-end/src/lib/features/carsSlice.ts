@@ -50,6 +50,15 @@ export const deleteCar = createAsyncThunk('cars/deleteCar', async (id: any) => {
   return response.data
 })
 
+// Add this to your carsSlice.ts file
+export const fetchCarById = createAsyncThunk(
+  'cars/fetchCarById',
+  async (id: string | number) => {    
+    const response = await api.get(`/cars/${id}`);
+    return await response.data.data;
+  }
+);
+
 export interface Car {
   id: number;
   brand: string;
@@ -66,23 +75,30 @@ export interface Car {
   price_per_day: number;
   status: string;
   description: string;
+  currentCar: Car | null; 
+  loading: boolean;
+  error: string ;
 }
 
 
 interface CarsState {
   cars: Car[]
-  error: string | null
+  error: string 
+  currentCar: Car | null;
+  loading: boolean;
 }
 
 const initialState: CarsState = {
   cars: [],
-  error: null
+  error: '',
+  currentCar: null, 
+  loading: false, 
 }
 
 const carsSlice = createSlice({
   name: 'cars',
   initialState,
-  reducers: {}, // Pas d'actions synchrones ici
+  reducers: {}, 
   extraReducers: builder => {
     builder
       .addCase(fetchCars.fulfilled, (state, action) => {
@@ -90,21 +106,36 @@ const carsSlice = createSlice({
       })
 
       .addCase(addCar.fulfilled, (state, action) => {
-        state.cars.push(action.payload) // Ajouter la nouvelle voiture à l'ét
+        state.cars.push(action.payload) 
       })
 
       .addCase(updateCar.fulfilled, (state, action) => {
-        const index = state.cars.findIndex(car => car.id === action.payload.id)
-        if (index !== -1) {
-          state.cars[index] = action.payload // Mettre à jour la voiture existante
+        if (action.payload && action.payload.id) {
+          const index = state.cars.findIndex(car => car.id === action.payload.id)
+          if (index !== -1) {
+            state.cars[index] = action.payload
+          } else {
+            state.cars.push(action.payload)
+          }
         }
       })
 
       .addCase(deleteCar.fulfilled, (state, action) => {
-        state.cars = state.cars.filter(car => car.id !== action.meta.arg) // Supprimer la voiture par ID
+        state.cars = state.cars.filter(car => car.id !== action.meta.arg) 
       })
+
+      .addCase(fetchCarById.fulfilled, (state, action) => {
+        state.currentCar = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchCarById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCarById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   }
 })
 
-// 🔹 Exporter le reducer pour l'intégrer au store
 export default carsSlice.reducer

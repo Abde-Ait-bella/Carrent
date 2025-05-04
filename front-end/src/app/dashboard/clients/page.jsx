@@ -1,22 +1,28 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Poppins } from 'next/font/google'
-import useReservationStore from '@/app/store/storeFetch'
+import { fetchReservations } from '@/lib/features/reservationSlice'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import * as Tooltip from '@radix-ui/react-tooltip'
-// import cancledSVG from '../../asset²s/img/pending.svg'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 
 function page () {
-  const { reservations, fetchReservations } = useReservationStore()
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    fetchReservations()
+    dispatch(fetchReservations())
   }, [])
 
-  const uniqueReservations = reservations.filter(
+  const reservations = useAppSelector(state => state.reservation.reservations)
+
+  // Make sure we only work with reservations that have valid user objects
+  const filteredReservations = reservations.filter(reser => reser && reser.user)
+
+  const uniqueReservations = filteredReservations.filter(
     (reser, index, self) =>
       index === self.findIndex(u => u.id === reser.user_id)
   )
@@ -31,15 +37,10 @@ function page () {
     startIndex + itemsPerPage
   )
 
-  const lengthreser = reservations.map(r => {
-    reservations.find(res => res.user.id == r.user.id)
-  })
-
-  console.log(
-    reservations.map(r => {
-      reservations.find(res => res.user.id == r.user.id)
-    }).length
-  )
+  // Fix the lengthreser by counting the actual reservations properly
+  const countUserReservations = (userId) => {
+    return filteredReservations.filter(res => res.user && res.user.id === userId).length
+  }
 
   return (
     <div className='shadow-lg rounded-lg w-full overflow-hidden'>
@@ -63,7 +64,7 @@ function page () {
           </thead>
           <tbody className='bg-white dark:bg-gray-800 divide-y dark:divide-gray-700'>
             {paginatedData.length > 0 ? (
-              paginatedData.map(d => (
+              paginatedData.map((d, index) => (
                 <tr
                   key={d.id || index}
                   className='text-gray-700 dark:text-gray-400'
@@ -85,24 +86,24 @@ function page () {
                       </div>
                       <div>
                         <p className={` text-lg ${poppins.className}`}>
-                          {d.user.name}
+                          {d.user?.name || "Client"}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
                     <span>
-                      {formatDistanceToNow(new Date(d.created_at), {
+                      {formatDistanceToNow(new Date(d.created_at || Date.now()), {
                         addSuffix: true,
                         locale: fr
                       })}
                     </span>
                   </td>
                   <td className={`px-4 py-3 text-sm ${poppins.className}`}>
-                    {lengthreser.length}{' '}
+                    {d.user ? countUserReservations(d.user.id) : 0}{' '}
                     <span className='text-bold'>
                       Reservation
-                      {lengthreser.length > 1 ? 's' : ''}
+                      {d.user && countUserReservations(d.user.id) > 1 ? 's' : ''}
                     </span>
                   </td>
 
@@ -112,7 +113,7 @@ function page () {
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
                           <div>
-                            <button class={`group ${poppins.className} group group-hover:from-[#1F4068] group-hover:to-[#6083B7] inline-flex relative justify-center items-center bg-gradient-to-br from-[#2C5A96] to-[#6083B7] mr-2 p-0.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-200 dark:focus:ring-[#0E2540] font-medium text-gray-900 hover:text-white dark:text-white text-sm`}>
+                            <button class={`group ${poppins.className} group group-hover:from-[#1F4068] group-hover:to-[#6083B7] inline-flex relative justify-center items-center bg-gradient-to-br from-[#2C5A96] to-[#6083B7] mr-2 p-0.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-purple-200 dark:focus:ring-[#0E2540] font-medium text-gray-900  dark:text-white text-sm`}>
                               <span class={`relative ${poppins.className} bg-white dark:bg-[#0E2540] group-hover:bg-opacity-0 px-5 py-1.5 rounded-md transition-all duration-75 ease-in`}>
                               Detailles
                               </span>
@@ -125,7 +126,7 @@ function page () {
                             side='right'
                             align='center'
                           >
-                            <div class='bg-white shadow-xl mx-4 sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
+                            <div class='bg-white shadow-xl sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto mt-16 rounded-lg sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm max-w-2xl text-gray-900'>
                               <div class='rounded-t-lg h-32 overflow-hidden'>
                                 <img
                                   class='w-full object-cover object-top'
@@ -141,8 +142,8 @@ function page () {
                                 />
                               </div>
                               <div class='mt-2 text-center'>
-                                <h2 class='font-semibold'>{d.user.name}</h2>
-                                <p class='text-gray-500'>{d.user.email}</p>
+                                <h2 class='font-semibold'>{d.user?.name || "Client"}</h2>
+                                <p class='text-gray-500'>{d.user?.email || ""}</p>
                               </div>
                               <div className='text-center'>
                                 <h6 className={` mt-3 ${poppins.className}`}>
@@ -244,7 +245,7 @@ function page () {
                       currentPage == 1
                         ? 'bg-gray-300'
                         : 'bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-900'
-                    } flex justify-center items-center   dark:bg-gray-800 ml-2 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                    } flex justify-center items-center   dark:bg-gray-800 ml-2 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                   >
                     <svg
                       className='me-2 w-3.5 h-3.5 rtl:rotate-180'
@@ -271,7 +272,7 @@ function page () {
                         onClick={() => setCurrentPage(index + 1)}
                         className={`flex justify-center items-center ${
                           currentPage == index + 1 ? 'bg-gray-700' : 'bg-gray-400'
-                        }  dark:hover:bg-gray-600 dark:bg-gray-800 px-4 border-0  dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                        }  dark:hover:bg-gray-600 dark:bg-gray-800 px-4 border-0  dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                       >
                         {index + 1}{' '}
                       </button>
@@ -286,7 +287,7 @@ function page () {
                       currentPage == totalPages
                         ? 'bg-gray-300'
                         : 'bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-900'
-                    } flex justify-center items-center  dark:bg-gray-800 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark:hover:text-white dark:text-gray-400 text-base`}
+                    } flex justify-center items-center  dark:bg-gray-800 px-4 border-0 dark:border-gray-700 rounded h-10 font-medium text-white dark: dark:text-gray-400 text-base`}
                   >
                     Next
                     <svg

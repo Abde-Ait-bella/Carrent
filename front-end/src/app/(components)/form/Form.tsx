@@ -4,11 +4,10 @@ import * as React from 'react'
 
 import { useForm } from 'react-hook-form'
 
-import { Poppins, Quicksand } from 'next/font/google'
+import { Poppins,  } from 'next/font/google'
 
 import {
   AlertDialog,
-  //   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -21,11 +20,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectGroup, SelectLabel } from '@/components/ui/select'
-// Ton composant Input personnalisé
+
 import {
   Form,
-  FormControl,
-  //   FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -38,21 +35,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-
-// import {
-//   Popover,
-//   PopoverContent,
-//   PopoverTrigger
-// } from '@/components/ui/popover'
-
-// import {
-//   Command,
-//   CommandEmpty,
-//   CommandGroup,
-//   CommandInput,
-//   CommandItem,
-//   CommandList
-// } from '@/components/ui/command'
 
 import { Check, ChevronsUpDown, CircleXIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -96,13 +78,13 @@ const Formulair: React.FC<MyComponentProps> = ({
   })
 
   React.useEffect(() => {
-    form.reset(defaultValues) // Mettre à jour les valeurs du formulaire
+    form.reset(defaultValues) 
   }, [defaultValues])
   
   return (
     <>
       <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <AlertDialogContent className='bg-[#292929] shadow-lg border border-gray-700 rounded-lg max-w-4xl max-h-[90vh] overflow-auto text-white scrollbar-container'>
+        <AlertDialogContent className='bg-[#CCE5F6] shadow-lg border border-gray-700 rounded-lg max-w-4xl max-h-[90vh] overflow-auto text-white scrollbar-container'>
           <style jsx global>{`
             .scrollbar-container::-webkit-scrollbar {
               width: 8px;
@@ -132,7 +114,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                 onClick={onClose}
               />
             </div>
-            <AlertDialogDescription className='text-gray-300'>
+            <AlertDialogDescription className='text-gray-900'>
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -204,63 +186,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                                   />
                                 </div>
                               ) :
-                                // field.type === 'select' &&
-                                //   field.label === 'Statut' ? (
-                                //   <Popover open={dropdownId == index + 1}>
-                                //     <PopoverTrigger asChild>
-                                //       <Button
-                                //         role='combobox'
-                                //         className={`${poppins.className} w-full text-gray-400 bg-gray-800 border-gray-700`}
-                                //         onClick={() => toggleDropdown(index + 1)}
-                                //       >
-                                //         {status
-                                //           ? field.options &&
-                                //           field.options.find(
-                                //             (op: any) => op.value === status
-                                //           )?.label
-                                //           : `Select ${field.label}...`}
-                                //         <ChevronsUpDown className='opacity-50' />
-                                //       </Button>
-                                //     </PopoverTrigger>
-                                //     <PopoverContent className='p-0 w-full'>
-                                //       <Command>
-                                //         <CommandInput placeholder='Search framework...' />
-                                //         <CommandList>
-                                //           <CommandEmpty>
-                                //             No options found.
-                                //           </CommandEmpty>
-                                //           <CommandGroup>
-                                //             {field.options &&
-                                //               field.options.map((op: any) => (
-                                //                 <CommandItem
-                                //                   // key={op.value}
-                                //                   value={op.value}
-                                //                   onSelect={currentValue => {
-                                //                     setState(
-                                //                       currentValue === status
-                                //                         ? ''
-                                //                         : currentValue
-                                //                     )
-                                //                     setDropdownd(false)
-                                //                   }}
-                                //                 >
-                                //                   {op.label}
-                                //                   <Check
-                                //                     className={cn(
-                                //                       'ml-auto',
-                                //                       status === op.value
-                                //                         ? 'opacity-100'
-                                //                         : 'opacity-0'
-                                //                     )}
-                                //                   />
-                                //                 </CommandItem>
-                                //               ))}
-                                //           </CommandGroup>
-                                //         </CommandList>
-                                //       </Command>
-                                //     </PopoverContent>
-                                //   </Popover>
-                                // ) :
+                                
                                 field.type === 'select' &&
                                   field.label === 'Étoiles' ? (
                                   <Select
@@ -448,7 +374,7 @@ const Formulair: React.FC<MyComponentProps> = ({
                                         {...controlledField}
                                         type={field.type || 'text'}
                                         placeholder={field.placeholder || ''}
-                                        className={`bg-gray-800 border-gray-700 ${field.type == 'textarea'
+                                        className={`bg-gray-800 text-white border-gray-700 ${field.type == 'textarea'
                                           ? 'min-h-24 col-span-3 sm:col-span-2 md:col-span-3'
                                           : ''
                                           }`}

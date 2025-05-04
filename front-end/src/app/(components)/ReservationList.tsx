@@ -18,11 +18,17 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const quicksand = Quicksand({ subsets: ['latin'], weight: ['400', '700'] })
 
 interface ReservationListProps {
-  handleOpen?: any
+  updateStateParent?: any
 }
 const ReservationList : React.FC<ReservationListProps> = ({
-  handleOpen ,
+  updateStateParent ,
 }) => {
+
+  const handleClick = (data:any) =>{
+    console.log('data', data);
+    updateStateParent({ isOpen: true, reservation: data })
+  }
+
 
   const dispatch = useAppDispatch();
   const form = useForm();
@@ -38,6 +44,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
     contentToast: null,
 
   })
+
 
   const [valueStatus, setValueStatus] = useState()
 
@@ -365,7 +372,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
                                   Change Status
                                 </button>
                                 <button onClick={() => toggleUpdateStatus(d.id)} className={`block ${poppins.className} text-[.8rem] bg-[#3A5A75] hover:shadow-lg mx-auto px-2 py-2 rounded-full w-1/2 text-white`}>
-                                  Chanege Paiment
+                                  Change Payment
                                 </button>
                               </div>
                             </div>
@@ -430,7 +437,7 @@ const ReservationList : React.FC<ReservationListProps> = ({
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => handleOpen(d)}
+                        onClick={() => handleClick(d)}
                         variant='outline'
                         className={`font-bold text-lg text-[#1b4569] ${quicksand.className}`}
                       >

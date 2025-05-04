@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('image');
             $table->string('quantity');
             $table->integer('mileage');
-            $table->integer('resduce');
             $table->integer('stars');
             $table->decimal('price_per_day', 10, 2);
             $table->enum('status', ['disponible', 'reserve', 'loue', 'maintenance']);

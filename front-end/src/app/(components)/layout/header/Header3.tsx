@@ -14,8 +14,8 @@ export default function Header3({ scroll, isMobileMenu, handleMobileMenu, handle
 						<div className="header-left">
 							<div className="header-logo">
 								<Link className="d-flex" href="/">
-									<img className="light-mode" alt="Carento" src="/assets/imgs/template/logo-d.svg" />
-									<img className="dark-mode" alt="Carento" src="/assets/imgs/template/logo-w.svg" />
+									<img className="light-mode h-[3rem]" alt="Carento" src="/assets/imgs/template/logo-d.svg" />
+									<img className="dark-mode h-[3rem]" alt="Carento" src="/assets/imgs/template/logo-w.svg" />
 								</Link>
 							</div>
 							<div className="header-nav">
